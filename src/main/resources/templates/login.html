@@ -2,17 +2,18 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>se Connecter</title>
+    <title>Connexion</title>
 </head>
 <body>
 <h2>Connexion</h2>
 
 <form method="post" action="/login">
-    <input type="email" name="email" placeholder="Email">
-    <input type="password" name="password" placeholder="Mot de passe">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Mot de passe" required>
     <button type="submit">Se connecter</button>
-
-    <p th:text="${error}" style="color:red"></p>
 </form>
+
+<p th:if="${param.error}" style="color:red">Email ou mot de passe incorrect</p>
+<p th:if="${param.logout}" style="color:green">Vous êtes déconnecté</p>
 </body>
 </html>
