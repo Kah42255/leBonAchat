@@ -99,4 +99,6 @@ public class utilisateur {
     }
 
 
+    public utilisateur orElseThrow(Object utilisateurNonTrouvé) {
+    }
 }
