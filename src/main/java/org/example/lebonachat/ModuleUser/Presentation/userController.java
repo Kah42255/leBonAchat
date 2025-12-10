@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
+
 @Controller
 public class userController {
 
@@ -33,7 +35,7 @@ public class userController {
         System.out.println("Formulaire reçu pour email : " + email);
         try {
             userService.registerUser(nom, prenom, email, password, numTel);
-            return "redirect:/login"; // après inscription, redirection vers login
+            return "redirect:/login";
         } catch (RuntimeException e) {
             model.addAttribute("error", e.getMessage());
             return "register";
@@ -42,11 +44,13 @@ public class userController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login"; // page de login
+        return "login";
     }
 
     @GetMapping("/accueil")
-    public String accueil() {
-        return "accueil"; // page après login
+    public String accueil(Model model, Principal principal) {
+        model.addAttribute("email", principal.getName());
+        return "/accueil";
     }
+
 }

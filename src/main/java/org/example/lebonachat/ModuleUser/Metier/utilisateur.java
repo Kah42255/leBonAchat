@@ -95,7 +95,7 @@ public class utilisateur {
     }
 
     public boolean isAdmin() {
-        return this.role == Role.ADMIN;
+        return this.role == Role.ROLE_ADMIN;
     }
 
 

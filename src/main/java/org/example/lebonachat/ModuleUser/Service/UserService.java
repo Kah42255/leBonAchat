@@ -32,7 +32,7 @@ public class UserService {
         user.setPrenom(prenom);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(Role.USER);
+        user.setRole(Role.ROLE_USER);
         user.setNumTel(numTel);
 
         return userRepository.save(user);

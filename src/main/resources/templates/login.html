@@ -1,19 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Connexion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h2>Connexion</h2>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<form method="post" action="/login">
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <button type="submit">Se connecter</button>
-</form>
+<div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
 
-<p th:if="${param.error}" style="color:red">Email ou mot de passe incorrect</p>
-<p th:if="${param.logout}" style="color:green">Vous êtes déconnecté</p>
+    <h2 class="text-2xl font-bold text-center mb-6">Connexion</h2>
+
+    <form method="post" action="/login" class="space-y-4">
+
+        <input type="email" name="email" placeholder="Email" required
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"/>
+
+        <input type="password" name="password" placeholder="Mot de passe" required
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"/>
+
+        <button type="submit"
+                class="w-full bg-[#fd6c9e] text-white py-2 rounded-lg hover:bg-[#f18baa] transition">
+            Se connecter
+        </button>
+
+    </form>
+
+    <!-- Message d’erreur en cas de login échoué -->
+    <p th:if="${param.error}" class="text-red-600 text-center mt-4">
+        Email ou mot de passe incorrect
+    </p>
+
+    <!-- Message après déconnexion -->
+    <p th:if="${param.logout}" class="text-green-600 text-center mt-4">
+        Vous êtes déconnecté
+    </p>
+
+    <div class="text-center mt-6">
+        <p class="text-gray-700 mb-2">Tu es nouveau ?</p>
+        <a href="/register"
+           class="inline-block bg-[#fd6c9e] text-white px-4 py-2 rounded-lg
+              hover:bg-[#f18baa] transition font-semibold">
+            Créer un compte
+        </a>
+    </div>
+
+</div>
+
 </body>
 </html>
