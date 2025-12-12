@@ -11,7 +11,8 @@
 <div class="container mt-4">
     <h2 class="text-center mb-4">Créer une nouvelle annonce</h2>
 
-    <form th:action="@{/annonce/save}" th:object="${annonce}" method="post" class="card p-4 shadow">
+    <!-- FORMULAIRE UNIQUE AVEC ENCTYPE -->
+    <form th:action="@{/annonce/save}" th:object="${annonce}" method="post" enctype="multipart/form-data" class="card p-4 shadow">
 
         <div class="mb-3">
             <label class="form-label">Titre</label>
@@ -33,7 +34,19 @@
             <input type="text" th:field="*{ville}" class="form-control" required>
         </div>
 
-        <button class="btn btn-success">Enregistrer</button>
+        <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            <select th:field="*{category.id}" class="form-select" required>
+                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.nom}"></option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Image</label>
+            <input type="file" name="imageFile" class="form-control">
+        </div>
+
+        <button type="submit" class="btn btn-success">Enregistrer</button>
     </form>
 </div>
 

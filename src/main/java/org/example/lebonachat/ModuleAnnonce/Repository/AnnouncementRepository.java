@@ -10,4 +10,7 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
     List<Announcement> findByTitreContainingIgnoreCase(String keyword);
 
     List<Announcement> findByVilleContainingIgnoreCase(String ville);
+
+    List<Announcement> findByCategoryId(Long categoryId);
+
 }

@@ -33,9 +33,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-               // .csrf(csrf -> csrf.disable()) // à activer si tu ajoutes un formulaire CSRF complet
+                // à activer si tu gères le CSRF correctement
+                //.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/register",
+                                "/annonces",          // Ajoutez cette ligne
+                                "/annonce/**",        // Ajoutez cette ligne
+                                "/search",
+                                "/filter/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/uploads/**",        // <-- Important : autorise les uploads
+                                "/error"               // <-- autorise l'accès aux images
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form

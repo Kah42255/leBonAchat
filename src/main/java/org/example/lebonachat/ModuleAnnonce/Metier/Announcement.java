@@ -2,6 +2,7 @@ package org.example.lebonachat.ModuleAnnonce.Metier;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.lebonachat.ModuleCategory.Metier.Category;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 
 @Entity
@@ -18,6 +19,10 @@ public class Announcement {
     private String description;
     private double prix;
     private String ville;
+    private String imagePath;
+    @ManyToOne
+    private Category category;
+
 
     @ManyToOne
     @JoinColumn(name = "user_id")
