@@ -5,6 +5,7 @@ import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
 import org.example.lebonachat.ModuleAnnonce.Repository.AnnouncementRepository;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -47,4 +48,15 @@ public class AnnouncementService {
 
         return repo.save(annonce);
     }
+
+    public List<Announcement> filterByCategory(Long categoryId) {
+
+        // si aucune catégorie n'est choisie, renvoyer toutes les annonces
+        if (categoryId == null || categoryId == 0) {
+            return repo.findAll();
+        }
+
+        return repo.findByCategoryId(categoryId);
+    }
+
 }
