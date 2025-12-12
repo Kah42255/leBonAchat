@@ -7,7 +7,6 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class Category {
 
     @Id
