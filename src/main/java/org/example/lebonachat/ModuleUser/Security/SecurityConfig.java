@@ -1,4 +1,4 @@
-package org.example.lebonachat.config;
+package org.example.lebonachat.ModuleUser.Security;
 
 import org.example.lebonachat.ModuleUser.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +43,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/annonces", true)
+                        .defaultSuccessUrl("/accueil", true)
                         .failureUrl("/login?error")
                         .permitAll()
                 )
