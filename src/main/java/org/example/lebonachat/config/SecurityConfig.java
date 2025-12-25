@@ -1,4 +1,4 @@
-package org.example.lebonachat.ModuleUser.Security;
+package org.example.lebonachat.config;
 
 import org.example.lebonachat.ModuleUser.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -33,22 +33,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // à activer si tu gères le CSRF correctement
-                //.csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/",
                                 "/login",
+                                "/accueil",
                                 "/register",
-                                "/annonces",          // Ajoutez cette ligne
-                                "/annonce/**",        // Ajoutez cette ligne
+                                "/annonces",
+                                "/profil",
+                                "/annonce/**",
                                 "/search",
                                 "/filter/**",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/uploads/**",        // <-- Important : autorise les uploads
-                                "/error"               // <-- autorise l'accès aux images
+                                "/uploads/**",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
@@ -66,7 +67,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
-                .userDetailsService(userDetailsService); // configure ton CustomUserDetailsService
+                .userDetailsService(userDetailsService); // configure  CustomUserDetailsService
 
         return http.build();
     }
