@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails annonce</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-4">
+
+    <h2 class="mb-4" th:text="${annonce.titre}"></h2>
+
+    <div class="card shadow p-4">
+
+        <p><strong>Description :</strong></p>
+        <p th:text="${annonce.description}"></p>
+
+        <p><strong>Prix :</strong>
+            <span th:text="${annonce.prix}"></span> DA
+        </p>
+
+        <p><strong>Ville :</strong>
+            <span th:text="${annonce.ville}"></span>
+        </p>
+
+
+        <a href="/annonces" class="btn btn-secondary mt-3">Retour</a>
+    </div>
+</div>
+
+</body>
+</html>
