@@ -24,7 +24,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager nécessaire pour formLogin
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -33,9 +32,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-               // .csrf(csrf -> csrf.disable()) // à activer si tu ajoutes un formulaire CSRF complet
                 .authorizeHttpRequests(auth -> auth
+                        // 👉 autoriser les images uploadées
+                        .requestMatchers("/uploads/**").permitAll()
+
+                        // 👉 autoriser login/register
                         .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
+
+                        // tout le reste doit être authentifié
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -52,9 +56,8 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
-                .userDetailsService(userDetailsService); // configure ton CustomUserDetailsService
+                .userDetailsService(userDetailsService);
 
         return http.build();
     }
-
 }
