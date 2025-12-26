@@ -32,14 +32,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+
                 .authorizeHttpRequests(auth -> auth
-                        // 👉 autoriser les images uploadées
-                        .requestMatchers("/uploads/**").permitAll()
-
-                        // 👉 autoriser login/register
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
-
-                        // tout le reste doit être authentifié
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/accueil",
+                                "/register",
+                                "/annonces",
+                                "/profil",
+                                "/annonce/**",
+                                "/search",
+                                "/filter/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/uploads/**",
+                                "/error"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -47,7 +57,7 @@ public class SecurityConfig {
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/annonces", true)
+                        .defaultSuccessUrl("/accueil", true)
                         .failureUrl("/login?error")
                         .permitAll()
                 )
@@ -56,7 +66,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
-                .userDetailsService(userDetailsService);
+                .userDetailsService(userDetailsService); // configure  CustomUserDetailsService
 
         return http.build();
     }
