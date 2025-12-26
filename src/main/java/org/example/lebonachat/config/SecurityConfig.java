@@ -24,7 +24,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager nécessaire pour formLogin
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
@@ -71,5 +70,4 @@ public class SecurityConfig {
 
         return http.build();
     }
-
 }
