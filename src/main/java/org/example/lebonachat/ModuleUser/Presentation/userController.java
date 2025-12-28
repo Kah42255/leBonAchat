@@ -2,7 +2,10 @@ package org.example.lebonachat.ModuleUser.Presentation;
 
 import jakarta.validation.Valid;
 import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
+import org.example.lebonachat.ModuleAnnonce.Repository.AnnouncementRepository;
 import org.example.lebonachat.ModuleAnnonce.Service.AnnouncementService;
+import org.example.lebonachat.ModuleCategory.Metier.Category;
+import org.example.lebonachat.ModuleCategory.Repository.CategoryRepository;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,17 +18,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
+import java.util.Scanner;
 
 @Controller
 public class userController {
 
     private final UserService userService;
     private final AnnouncementService announcementService;
+    private final AnnouncementRepository announcementRepository;
+    private final CategoryRepository categoryRepository ;
 
     @Autowired
-    public userController(UserService userService, AnnouncementService announcementService) {
+    public userController(UserService userService, AnnouncementService announcementService,AnnouncementRepository announcementRepository ,
+    CategoryRepository categoryRepository) {
         this.userService = userService;
         this.announcementService = announcementService;
+        this.announcementRepository = announcementRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @GetMapping("/register")
@@ -86,15 +96,44 @@ public class userController {
     }
 
     @GetMapping("/accueil")
-    public String accueil(Model model) {
+    public String accueil(
+            @RequestParam(required = false) Long categoryId ,
+            Model model) {
+
         utilisateur user = userService.getConnectedUser();
-        if (user != null) {
-            model.addAttribute("nom", user.getNom());
+        model.addAttribute("nom", user != null ? user.getNom() : null);
+
+        List<Announcement> annonces;
+        String categoryNom = null;
+
+        if (categoryId != null) {
+            // Filtrer par catégorie
+            annonces = announcementRepository.findByCategoryId(categoryId);
+
+            // Récupérer le nom de la catégorie pour l'affichage
+            Optional<Category> category = categoryRepository.findById(categoryId);
+            if (category.isPresent()) {
+                categoryNom = category.get().getNom(); // Note: getNom() au lieu de getName()
+                model.addAttribute("categoryNom", categoryNom);
+            }
+
+            model.addAttribute("categoryId", categoryId);
         } else {
-            model.addAttribute("nom", null);
+            // Toutes les annonces
+            annonces = announcementRepository.findAll();
         }
+
+        model.addAttribute("annonces", annonces);
+
+
         return "accueil";
     }
+
+
+
+
+
+
 
     @GetMapping("/profil")
     public String profilePage(Model model) {

@@ -15,4 +15,6 @@ public interface AnnouncementRepository extends JpaRepository<Announcement, Long
     List<Announcement> findByCategoryId(Long categoryId);
     List<Announcement> findByCreatedBy(utilisateur user);
 
+
+    Long id(Long id);
 }

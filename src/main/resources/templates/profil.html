@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,9 +40,12 @@
             <a th:href="@{/accueil}" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Accueil</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Immobilier</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Véhicules</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Mode</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Vacances</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Emploi</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Santé & Beauté</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Électronique</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Alimentaires</a>
             <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
         </div>
     </div>
@@ -106,8 +112,14 @@
         </div>
 
         <!-- Right Column: Edit Profile -->
-        <div class="lg:col-span-1">
+        <div class="lg:col-span-1 flex flex-col justify-start h-full">
             <a th:href="@{/profile/edit}" class="w-full bg-[#FF8DA1] text-white px-4 py-2 rounded-lg hover:bg-[#FF6C9E] text-center mb-4">Modifier le profil</a>
+            <div sec:authorize="hasRole('ADMIN')">
+                <a th:href="@{/category/list}"
+                   class="w-full bg-[#FF8DA1] text-white px-4 py-2 rounded-lg hover:bg-[#FF6C9E] text-center mb-4">
+                    Gérer les catégories
+                </a>
+            </div>
         </div>
     </div>
 </div>
