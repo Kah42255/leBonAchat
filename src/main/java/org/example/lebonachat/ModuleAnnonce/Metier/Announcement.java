@@ -5,6 +5,8 @@ import lombok.*;
 import org.example.lebonachat.ModuleCategory.Metier.Category;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 
+import java.time.LocalDate;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -20,6 +22,12 @@ public class Announcement {
     private double prix;
     private String ville;
     private String imagePath;
+    private LocalDate date;
+    @PrePersist
+    protected void onCreate() {
+        this.date = LocalDate.now();
+    }
+
     @ManyToOne
     private Category category;
 

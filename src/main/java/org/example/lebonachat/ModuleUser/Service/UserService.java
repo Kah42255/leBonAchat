@@ -10,6 +10,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class UserService {
@@ -24,8 +26,13 @@ public class UserService {
     }
 
 
+    public utilisateur findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec email: " + email));
+    }
+
     public utilisateur registerUser(String nom, String prenom, String email, String password, String numTel) {
-        if (userRepository.findByEmail(email) != null) {
+        if (userRepository.findByEmail(email).isPresent()) {
             throw new RuntimeException("Email déjà utilisé");
         }
 
@@ -34,27 +41,21 @@ public class UserService {
         user.setPrenom(prenom);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(Role. ROLE_USER);
+        user.setRole(Role.ROLE_USER);
         user.setNumTel(numTel);
 
         return userRepository.save(user);
     }
 
+
     public utilisateur getConnectedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        utilisateur user = userRepository.findByEmail(email);
-        if (user == null) {
-            throw new RuntimeException("Utilisateur non trouvé");
-        }
-        return user;
-    }
 
-   /* public utilisateur loginUser(String email, String password) {
-        utilisateur user = userRepository.findByEmail(email);
-        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            return user;
+        if (auth == null || auth.getName() == null || auth.getName().equals("anonymousUser")) {
+            return null; // aucun utilisateur connecté
         }
-        return null;
-    }*/
+
+        return userRepository.findByEmail(auth.getName())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+    }
 }
