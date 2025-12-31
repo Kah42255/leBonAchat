@@ -54,7 +54,13 @@ public class SecurityConfig {
                                 "/error"
                         ).permitAll()
 
-                        // 🔐 GESTION DES CATÉGORIES → ADMIN SEULEMENT
+                        .requestMatchers(
+                                "/profil",
+                                "/profil/**"
+                        ).authenticated()
+
+                        .requestMatchers("/annonces/**").authenticated()
+
                         .requestMatchers(
                                 "/category/new",
                                 "/category/save",
@@ -80,7 +86,7 @@ public class SecurityConfig {
 
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("/accueil")
                         .permitAll()
                 )
 

@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Nouvelle annonce</title>
+    <title th:text="${annonce.id != null ? 'Modifier annonce' : 'Nouvelle annonce'}">Nouvelle annonce</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
@@ -10,10 +10,14 @@
 <body class="bg-gray-100">
 
 <div class="container mt-4">
-    <h2 class="text-center mb-4 text-2xl font-bold">Créer une nouvelle annonce</h2>
+    <h2 class="text-center mb-4 text-2xl font-bold"
+        th:text="${annonce.id != null ? 'Modifier annonce' : 'Créer une nouvelle annonce'}"></h2>
 
     <form th:action="@{/annonce/save}" th:object="${annonce}" method="post"
           enctype="multipart/form-data" class="card p-4 shadow">
+
+        <!-- Champ caché pour l'ID (essentiel pour la modification) -->
+        <input type="hidden" th:field="*{id}" />
 
         <div class="mb-3">
             <label class="form-label">Titre</label>
@@ -45,12 +49,16 @@
         <div class="mb-3">
             <label class="form-label">Image</label>
             <input type="file" name="imageFile" class="form-control">
+            <!-- Affiche l'image existante si modification -->
+            <div th:if="${annonce.imagePath != null}" class="mt-2">
+                <img th:src="@{${annonce.imagePath}}" alt="Image existante" class="img-thumbnail" style="max-width:150px;">
+            </div>
         </div>
 
         <button type="submit"
                 class="inline-block bg-[#fd6c9e] text-white px-4 py-2 rounded-lg
                        hover:bg-[#f18baa] transition duration-300 font-semibold">
-            Enregistrer
+            <span th:text="${annonce.id != null ? 'Modifier' : 'Enregistrer'}"></span>
         </button>
     </form>
 </div>

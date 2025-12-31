@@ -61,5 +61,7 @@ public class AnnouncementService {
     public List<Announcement> getByUser(utilisateur user) {
         return repo.findByCreatedBy(user);
     }
-
+    public List<Announcement> getByCategoryId(Long categoryId) {
+        return repo.findByCategoryId(categoryId);
+    }
 }
