@@ -25,7 +25,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     public utilisateur findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec email: " + email));
@@ -47,7 +46,9 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
+    /**
+     * Renvoie l'utilisateur connecté ou null si aucun utilisateur n'est connecté
+     */
     public utilisateur getConnectedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -55,7 +56,29 @@ public class UserService {
             return null; // aucun utilisateur connecté
         }
 
-        return userRepository.findByEmail(auth.getName())
-                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        return userRepository.findByEmail(auth.getName()).orElse(null);
+    }
+
+    @Transactional
+    public utilisateur save(utilisateur user) {
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public void update(utilisateur user) {
+        userRepository.save(user);
+    }
+
+    public String encodePassword(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
+    public utilisateur getById(Long id) {
+        Optional<utilisateur> userOpt = userRepository.findById(id);
+        return userOpt.orElse(null);
     }
 }

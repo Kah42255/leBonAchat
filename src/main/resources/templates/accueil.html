@@ -4,62 +4,65 @@
     <meta charset="UTF-8">
     <title>Accueil - Lebonachat</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body class="bg-gray-100">
 
 <!-- Navbar -->
 <nav class="bg-white shadow-md w-full border-b border-gray-200 p-4">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <!-- Logo -->
-        <span style="font-family: 'Poppins', sans-serif;" class="text-2xl font-bold text-[#fd6c9e]">Lebonachat</span>
+        <span class="text-2xl font-bold text-[#fd6c9e]">Lebonachat</span>
 
-        <!-- Actions: Search + Add annonce + Profile -->
         <div class="flex flex-col md:flex-row md:items-center gap-4 w-full md:w-auto">
-
-            <!-- Déposer annonce -->
-            <a th:href="${nom != null} ? '/annonces' : '/login'"
+            <a th:href="${connectedUser != null} ? '/annonces' : '/login'"
                class="inline-flex items-center justify-center bg-[#fd6c9e] text-white px-4 py-2 rounded-lg hover:bg-[#f18baa] transition font-semibold">
-                <img src="/images/plus.png" alt="Plus" class="h-5 w-5 mr-2">
                 Déposer une annonce
             </a>
 
-            <!-- Recherche -->
-            <div class="relative flex-1">
-                <input type="text" placeholder="Rechercher..."
-                       class="block w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#fd6c9e] focus:border-[#fd6c9e]"/>
-                <svg class="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0z"/>
-                </svg>
-            </div>
+            <form class="flex flex-1 gap-2" method="get" action="/search">
+                <input type="text" name="keyword"
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                       placeholder="Rechercher...">
+                <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold">Rechercher</button>
+            </form>
 
-            <!-- Compte -->
-            <span th:if="${nom == null}">
-    <a th:href="@{/login}" class="flex flex-col items-center hover:text-[#fd6c9e]">
-        <img src="/images/compte.png" alt="Compte" class="h-8 w-8 mb-1">
-        <span>Se connecter</span>
-    </a>
-</span>
+            <!-- Visiteur -->
+            <span th:if="${connectedUser == null}">
+                <a th:href="@{/login}" class="flex flex-col items-center hover:text-[#fd6c9e]">
+                    <img src="/images/compte.png" alt="Compte" class="h-8 w-8 mb-1">
+                    <span>Se connecter</span>
+                </a>
+            </span>
 
-            <span th:if="${nom != null}">
-    <a th:href="@{/profil}" class="flex flex-col items-center hover:text-[#fd6c9e] group">
-        <div class="relative">
-            <div class="h-8 w-8 rounded-full bg-gradient-to-r from-[#fd6c9e] to-[#ff8ab3] flex items-center justify-center text-white font-semibold mb-1 group-hover:scale-105 transition-transform"
-                 th:text="${#strings.toUpperCase(#strings.substring(nom,0,1)) + #strings.toUpperCase(#strings.substring(prenom,0,1))}">
-                AB
-            </div>
-            <div class="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></div>
-        </div>
-        <span class="text-sm font-medium text-gray-700" th:text="${nom}">Nom</span>
-    </a>
-</span>
+            <!-- Utilisateur connecté -->
+            <span th:if="${connectedUser != null}" class="flex items-center gap-4">
+                <a th:href="@{/profil}" class="flex flex-col items-center hover:text-[#fd6c9e] group">
+                    <div class="relative">
+                        <div class="h-8 w-8 rounded-full bg-gradient-to-r from-[#fd6c9e] to-[#ff8ab3] flex items-center justify-center text-white font-semibold mb-1 group-hover:scale-105 transition-transform"
+                             th:text="${#strings.toUpperCase(#strings.substring(connectedUser.nom,0,1)) + #strings.toUpperCase(#strings.substring(connectedUser.prenom,0,1))}">AB
+                        </div>
+                        <div class="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></div>
+                    </div>
+                    <span class="text-sm font-medium text-gray-700" th:text="${connectedUser.nom}">Nom</span>
+                </a>
 
-
+                <!-- Panier -->
+                <a th:href="@{/panier}" class="flex flex-col items-center hover:text-[#fd6c9e] group">
+                    <div class="relative">
+                        <i class="fa-solid fa-cart-shopping text-2xl text-gray-700 group-hover:text-[#fd6c9e]"></i>
+                        <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
+                              th:text="${connectedUser.panier != null ? connectedUser.panier.lignes.size() : 0}">0</span>
+                    </div>
+                    <span class="text-sm text-gray-700">Panier</span>
+                </a>
+            </span>
         </div>
     </div>
 
     <!-- Categories -->
     <div class="flex flex-wrap gap-6 mt-4 text-gray-700 font-medium justify-center md:justify-start">
-        <a href="@{/accueil(categoryId=1)}" class="hover:text-[#fd6c9e]">Immobilier</a>
+        <a th:href="@{/accueil}" class="hover:text-[#fd6c9e]">Accueil</a>
+        <a th:href="@{/accueil(categoryId=1)}" class="hover:text-[#fd6c9e]">Immobilier</a>
         <a href="#" class="hover:text-[#fd6c9e]">Véhicules</a>
         <a href="#" class="hover:text-[#fd6c9e]">Vacances</a>
         <a href="#" class="hover:text-[#fd6c9e]">Emploi</a>
@@ -68,55 +71,31 @@
     </div>
 </nav>
 
-<!-- Main Content -->
-<div class="max-w-7xl mx-auto px-4 py-6">
-
-    <!-- Google Ads Placeholder Top -->
-    <div class="my-6">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXX"
-             data-ad-slot="YYYYYYYYYY"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-    </div>
-
-    <!-- Annonces Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div class="bg-white shadow-md rounded-lg overflow-hidden p-4" th:each="a : ${annonces}">
-            <!-- Image -->
-            <div th:if="${a.imagePath != null}" class="h-48 w-full">
-                <img th:src="@{${a.imagePath}}" alt="Image annonce" class="w-full h-48 object-cover"/>
-            </div>
-            <h3 class="text-lg font-bold mb-2 text-gray-800" th:text="${a.titre}"></h3>
-            <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
-            <p class="text-gray-700 mb-1"><strong>Prix:</strong> <span th:text="${a.prix}"></span> DA</p>
-            <p class="text-gray-700 mb-4"><strong>Ville:</strong> <span th:text="${a.ville}"></span></p>
-
-            <!-- Voir détails -->
-            <a th:href="@{'/annonce/' + ${a.id}}"
-               class="px-3 py-1 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 text-sm font-semibold">
-                Voir détails
-            </a>
+<!-- Annonces Grid -->
+<div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden p-4" th:each="a : ${annonces}">
+        <div th:if="${a.imagePath != null}" class="h-48 w-full">
+            <img th:src="@{${a.imagePath}}" alt="Image annonce" class="w-full h-48 object-cover"/>
         </div>
-    </div>
+        <h3 class="text-lg font-bold mb-2 text-gray-800" th:text="${a.titre}"></h3>
+        <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
+        <p class="text-gray-700 mb-1"><strong>Prix:</strong> <span th:text="${a.prix}"></span> DA</p>
+        <p class="text-gray-700 mb-4"><strong>Ville:</strong> <span th:text="${a.ville}"></span></p>
+        <a th:href="@{'/annonce/' + ${a.id}}"
+           class="px-3 py-1 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 text-sm font-semibold">
+            Voir détails
+        </a>
 
-    <!-- Google Ads Placeholder Bottom -->
-    <div class="my-6">
-        <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="ca-pub-XXXXXXXXXXXXXX"
-             data-ad-slot="ZZZZZZZZZZ"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+        <!-- Ajouter au panier : utilisateur uniquement -->
+        <form th:if="${connectedUser != null}"
+              th:action="@{/panier/ajouter/{id}(id=${a.id})}" method="post" class="mt-2">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit"
+                    class="px-3 py-1 bg-[#d94b7c] text-white rounded hover:bg-[#c43f6d] transition text-sm font-semibold">
+                Ajouter au panier
+            </button>
+        </form>
     </div>
-
 </div>
 
 </body>

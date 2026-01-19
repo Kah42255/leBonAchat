@@ -4,33 +4,95 @@
     <meta charset="UTF-8">
     <title>Détails annonce</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Styles similaires à ton précédent code */
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .annonce-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin: 24px auto; }
+        .annonce-title { font-size: 28px; font-weight: bold; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+        .annonce-info { margin-bottom: 14px; font-size: 16px; line-height: 1.6; display: flex; }
+        .annonce-label { font-weight: 600; color: #6b7280; display: inline-block; min-width: 140px; flex-shrink: 0; }
+        .annonce-value { color: #111827; flex-grow: 1; }
+        .image-container { background-color: #f9fafb; display: flex; align-items: center; justify-content: center; color: #999; font-size: 18px; height: 100%; min-height: 400px; }
+        .content-wrapper { max-width: 1200px; margin: 0 auto; padding: 32px 16px; }
+        .action-buttons { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb; }
+        .btn-retour, .btn-modifier, .btn-supprimer { color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 500; margin-right: 10px; cursor: pointer; }
+        .btn-retour { background-color: #fd6c9e; } .btn-modifier { background-color: #f8a1bd; } .btn-supprimer { background-color:#d94b7c; }
+        .btn-retour:hover { background-color: #e85b8c; } .btn-modifier:hover { background-color: #f48aad; } .btn-supprimer:hover { background-color: #c43f6d; }
+        .annonce-layout { display: flex; flex-direction: column; }
+        @media (min-width: 768px) { .annonce-layout { flex-direction: row; } }
+        .image-section { flex: 1; padding: 20px; }
+        .details-section { flex: 1; padding: 20px; }
+        .annonce-image { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .info-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    </style>
 </head>
+<body>
 
-<body class="bg-gray-50 min-h-screen">
+<div class="content-wrapper">
 
-<div class="max-w-4xl mx-auto p-4">
+    <h1 class="annonce-title" th:text="${annonce.titre}">VOITURE</h1>
 
-    <h2 class="text-3xl font-bold mb-4 text-gray-800" th:text="${annonce.titre}"></h2>
+    <div class="annonce-container">
+        <div class="annonce-layout">
 
-    <!-- Image -->
-    <div th:if="${annonce.imagePath != null}" class="mb-6">
-        <img th:src="@{${annonce.imagePath}}"
-             alt="Image annonce"
-             class="w-full max-w-2xl h-96 object-cover rounded-md mx-auto shadow-md"/>
-    </div>
+            <div class="image-section">
+                <div class="image-container">
+                    <div th:if="${annonce.imagePath != null}">
+                        <img th:src="${annonce.imagePath}" alt="Image de l'annonce" class="annonce-image">
+                    </div>
+                    <div th:if="${annonce.imagePath == null}">
+                        <div style="text-align: center; padding: 40px;">
+                            <p class="mt-4 text-gray-600">Aucune image disponible</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <p class="mb-3"><strong>Description :</strong></p>
-        <p class="text-gray-700 mb-4" th:text="${annonce.description}"></p>
+            <div class="details-section">
+                <div class="info-card">
+                    <div class="annonce-info">
+                        <span class="annonce-label">Prix :</span>
+                        <span class="annonce-value" th:text="${annonce.prix} + ' DA'"></span>
+                    </div>
+                    <div class="annonce-info">
+                        <span class="annonce-label">Description :</span>
+                        <span class="annonce-value" th:text="${annonce.description}"></span>
+                    </div>
+                    <div class="annonce-info">
+                        <span class="annonce-label">Ville :</span>
+                        <span class="annonce-value" th:text="${annonce.ville}"></span>
+                    </div>
+                    <div class="annonce-info">
+                        <span class="annonce-label">Catégorie :</span>
+                        <span class="annonce-value" th:text="${annonce.category.nom}"></span>
+                    </div>
+                    <div class="annonce-info">
+                        <span class="annonce-label">Date de création :</span>
+                        <span class="annonce-value" th:text="${annonce.date}"></span>
+                    </div>
+                    <div class="annonce-info">
+                        <span class="annonce-label">Créé par :</span>
+                        <span class="annonce-value">
+                          <a th:href="@{/profil/{id}(id=${annonce.createdBy.id})}"
+                             class="text-blue-600 hover:underline"
+                             th:text="${annonce.createdBy.email}">abc@usdb.dz</a>
+                        </span>
+                    </div>
 
-        <p class="text-gray-700 mb-2"><strong>Prix :</strong> <span th:text="${annonce.prix}"></span> DA</p>
-        <p class="text-gray-700 mb-2"><strong>Ville :</strong> <span th:text="${annonce.ville}"></span></p>
-        <p class="text-gray-700 mb-2"><strong>Catégorie :</strong> <span th:text="${annonce.category.nom}"></span></p>
+                    <div class="action-buttons">
+                        <a th:href="@{/annonces}" class="btn-retour">Retour</a>
+                        <a th:if="${user != null and user.id == annonce.createdBy.id}"
+                           th:href="@{/annonce/modifier/{id}(id=${annonce.id})}" class="btn-modifier">Modifier</a>
+                        <a th:if="${user != null and user.id == annonce.createdBy.id}"
+                           th:href="@{/annonce/delete/{id}(id=${annonce.id})}"
+                           onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')"
+                           class="btn-supprimer">Supprimer</a>
+                    </div>
 
-        <a href="/annonces"
-           class="inline-block mt-4 px-4 py-2 bg-[#fd6c9e] text-white rounded-lg hover:bg-[#f18baa] transition duration-300 font-semibold">
-            Retour
-        </a>
+                </div>
+            </div>
+
+        </div>
     </div>
 
 </div>

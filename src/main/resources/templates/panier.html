@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Mon Panier</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #fd6c9e; /* titre couleur principale */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #fd6c9e; /* couleur principale */
+            color: #ffffff;
+        }
+
+        .total {
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #fd6c9e;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: #ffffff;
+            background-color: #fd6c9e; /* couleur principale */
+            margin-right: 5px;
+        }
+
+        .btn:hover {
+            background-color: #e85b8c; /* hover un peu plus foncé */
+        }
+
+        .empty {
+            text-align: center;
+            color: #555;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        a.btn {
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>Mon Panier</h2>
+
+    <div th:if="${panier.lignes.empty}" class="empty">
+        Votre panier est vide.
+    </div>
+
+    <table th:if="${!panier.lignes.empty}">
+        <thead>
+        <tr>
+            <th>Produit</th>
+            <th>Prix unitaire</th>
+            <th>Quantité</th>
+            <th>Sous-total</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ligne : ${panier.lignes}">
+            <td th:text="${ligne.annonce.titre}">Titre</td>
+            <td th:text="${ligne.annonce.prix} + ' €'">0.0 €</td>
+            <td th:text="${ligne.quantite}">1</td>
+            <td th:text="${ligne.annonce.prix * ligne.quantite} + ' €'">0.0 €</td>
+            <td>
+                <form th:action="@{/panier/supprimer/{id}(id=${ligne.id})}" method="post" style="display:inline;">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div th:if="${!panier.lignes.empty}" class="total">
+        Total : <span th:text="${total}">0.0</span> DA
+    </div>
+
+    <div th:if="${!panier.lignes.empty}" style="text-align:center; margin-top:20px;">
+        <a href="/commande/valider" class="btn">Valider la commande</a>
+    </div>
+
+</div>
+</body>
+</html>
