@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Détails annonce</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-light">
+<body class="bg-gray-50 min-h-screen">
 
-<div class="container mt-4">
+<div class="max-w-4xl mx-auto p-4">
 
-    <h2 class="mb-4" th:text="${annonce.titre}"></h2>
+    <h2 class="text-3xl font-bold mb-4 text-gray-800" th:text="${annonce.titre}"></h2>
 
-    <div class="card shadow p-4">
-
-        <p><strong>Description :</strong></p>
-        <p th:text="${annonce.description}"></p>
-
-        <p><strong>Prix :</strong>
-            <span th:text="${annonce.prix}"></span> DA
-        </p>
-
-        <p><strong>Ville :</strong>
-            <span th:text="${annonce.ville}"></span>
-        </p>
-
-
-        <a href="/annonces" class="btn btn-secondary mt-3">Retour</a>
+    <!-- Image -->
+    <div th:if="${annonce.imagePath != null}" class="mb-6">
+        <img th:src="@{${annonce.imagePath}}"
+             alt="Image annonce"
+             class="w-full max-w-2xl h-96 object-cover rounded-md mx-auto shadow-md"/>
     </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <p class="mb-3"><strong>Description :</strong></p>
+        <p class="text-gray-700 mb-4" th:text="${annonce.description}"></p>
+
+        <p class="text-gray-700 mb-2"><strong>Prix :</strong> <span th:text="${annonce.prix}"></span> DA</p>
+        <p class="text-gray-700 mb-2"><strong>Ville :</strong> <span th:text="${annonce.ville}"></span></p>
+        <p class="text-gray-700 mb-2"><strong>Catégorie :</strong> <span th:text="${annonce.category.nom}"></span></p>
+
+        <a href="/annonces"
+           class="inline-block mt-4 px-4 py-2 bg-[#fd6c9e] text-white rounded-lg hover:bg-[#f18baa] transition duration-300 font-semibold">
+            Retour
+        </a>
+    </div>
+
 </div>
 
 </body>

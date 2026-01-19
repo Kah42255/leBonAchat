@@ -58,5 +58,8 @@ public class AnnouncementService {
 
         return repo.findByCategoryId(categoryId);
     }
+    public List<Announcement> getByUser(utilisateur user) {
+        return repo.findByCreatedBy(user);
+    }
 
 }

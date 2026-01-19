@@ -5,11 +5,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+@EnableMethodSecurity
 @Configuration
 public class SecurityConfig {
 
@@ -31,31 +32,59 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
                 .authorizeHttpRequests(auth -> auth
-                        // 👉 autoriser les images uploadées
-                        .requestMatchers("/uploads/**").permitAll()
 
-                        // 👉 autoriser login/register
-                        .requestMatchers("/login", "/register", "/css/**", "/js/**").permitAll()
 
-                        // tout le reste doit être authentifié
+                        // 🔓 Pages publiques
+                        .requestMatchers(
+                                "/",
+                                "/login",
+                                "/accueil",
+                                "/register",
+                                "/annonces",
+                                "/annonce/**",
+                                "/search",
+                                "/filter/**",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/uploads/**",
+                                "/error"
+                        ).permitAll()
+
+                        // 🔐 GESTION DES CATÉGORIES → ADMIN SEULEMENT
+                        .requestMatchers(
+                                "/category/new",
+                                "/category/save",
+                                "/category/delete/**"
+                        ).hasAuthority("ROLE_ADMIN")
+
+                        // 👀 Liste des catégories visible pour tous
+                        .requestMatchers("/category/list").permitAll()
+
+                        // 🔒 Tout le reste nécessite login
                         .anyRequest().authenticated()
                 )
+
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .usernameParameter("email")
                         .passwordParameter("password")
-                        .defaultSuccessUrl("/annonces", true)
+                        .defaultSuccessUrl("/accueil", true)
                         .failureUrl("/login?error")
                         .permitAll()
                 )
+
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login")
                         .permitAll()
                 )
+
+                // CustomUserDetailsService
                 .userDetailsService(userDetailsService);
 
         return http.build();
