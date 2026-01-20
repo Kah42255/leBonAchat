@@ -62,11 +62,35 @@
     <!-- Categories -->
     <div class="flex flex-wrap gap-6 mt-4 text-gray-700 font-medium justify-center md:justify-start">
         <a th:href="@{/accueil}" class="hover:text-[#fd6c9e]">Accueil</a>
-        <a th:href="@{/accueil(categoryId=1)}" class="hover:text-[#fd6c9e]">Immobilier</a>
-        <a href="#" class="hover:text-[#fd6c9e]">Véhicules</a>
-        <a href="#" class="hover:text-[#fd6c9e]">Vacances</a>
-        <a href="#" class="hover:text-[#fd6c9e]">Emploi</a>
-        <a href="#" class="hover:text-[#fd6c9e]">Électronique</a>
+        <a th:href="@{/accueil(categoryId=2)}"
+           th:class="${categoryId == 2} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+            Immobilier
+        </a>
+        <a th:href="@{/accueil(categoryId=8)}"
+           th:class="${categoryId == 8} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+           Téléphones
+        </a>
+        <a th:href="@{/accueil(categoryId=5)}"
+           th:class="${categoryId == 5} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+          Montre & Bijoux
+        </a>
+
+        <a  th:href="@{/accueil(categoryId=1)}"
+            th:class="${categoryId == 1} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+            Véhicules</a>
+        <a th:href="@{/accueil(categoryId=3)}"
+           th:class="${categoryId == 3} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+            vétements
+        </a>
+        <a th:href="@{/accueil(categoryId=4)}"
+           th:class="${categoryId == 4} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+           Chaussures
+        </a>
+        <a th:href="@{/accueil(categoryId=6)}"
+           th:class="${categoryId == 6} ? 'text-[#fd6c9e] font-bold' : 'hover:text-[#fd6c9e]'">
+           Electroménager
+        </a>
+
         <a href="#" class="hover:text-[#fd6c9e]">Contact</a>
     </div>
 </nav>
