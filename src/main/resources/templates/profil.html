@@ -7,6 +7,7 @@
     <title>Profil</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="_csrf" th:content="${_csrf.token}" />
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -15,7 +16,18 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center">
-                <span class="text-2xl font-bold text-[#fd6c9e]">Lebonachat</span>
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <!-- Logo -->
+                    <img src="/images/logo.png"
+                         alt="Logo"
+                         class="w-12 h-12 object-contain">
+
+                    <!-- Text logo -->
+                    <span class="text-3xl font-extrabold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
+        <span class="text-4xl">L</span>ebonachat
+    </span>
+                </div>
+
             </div>
             <div class="flex items-center">
                 <form th:if="${connectedUser != null}" th:action="@{/logout}" method="post" class="ml-2">
@@ -31,18 +43,6 @@
                 </a>
             </div>
         </div>
-        <div class="hidden md:flex space-x-8 mt-2">
-            <a th:href="@{/accueil}" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Accueil</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Immobilier</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Véhicules</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Mode</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Vacances</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Emploi</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Santé & Beauté</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Électronique</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Alimentaires</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
-        </div>
     </div>
 </nav>
 
@@ -52,7 +52,7 @@
         <div class="lg:col-span-2">
 
             <!-- Profile Info -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6 relative">
                 <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
                     <div class="relative">
                         <div class="h-32 w-32 rounded-full bg-gradient-to-r from-[#fd6c9e] to-[#ff8ab3] flex items-center justify-center text-white text-4xl font-bold"
@@ -69,6 +69,22 @@
                         <div class="flex items-center text-gray-600 mb-2">
                             <i class="fas fa-phone mr-2 text-gray-500"></i>
                             <span th:text="${user.numTel}">+213 123 456 789</span>
+                        </div>
+                    </div>
+
+                    <!-- Bouton 3 points pour signaler -->
+                    <div th:if="${connectedUser != null and user.id != connectedUser.id}" class="absolute top-4 right-4">
+                        <button id="profile-menu-button"
+                                class="px-2 py-1 text-gray-700 bg-white rounded hover:bg-gray-100 border border-gray-300">
+                            ⋮
+                        </button>
+
+                        <!-- Menu déroulant -->
+                        <div id="profile-dropdown-menu" class="hidden absolute right-0 mt-2 w-60 bg-white rounded shadow-lg z-50">
+                            <a href="#" th:onclick="'openReportModal(' + ${user.id} + '); return false;'"
+                               class="block px-4 py-2 text-gray-700 hover:bg-[#fd6c9e] hover:text-white">
+                                Signaler l'annonceur aux admins
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -118,6 +134,93 @@
         </div>
     </div>
 </div>
+
+<!-- Modal Signalement -->
+<div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+        <h2 class="text-lg font-semibold mb-4">Signaler l'annonceur</h2>
+        <div class="flex flex-col gap-2 mb-4">
+            <label><input type="radio" name="reportReason" value="Produits dangereux"> Publicité pour des produits dangereux (tabac, drogues, etc.)</label>
+            <label><input type="radio" name="reportReason" value="Fraude"> Fraude et escroquerie</label>
+            <label><input type="radio" name="reportReason" value="Politique"> Non-respect des politiques de plateforme</label>
+            <label><input type="radio" name="reportReason" value="Contenu"> Contenus inappropriés</label>
+        </div>
+        <div class="flex justify-end gap-2">
+            <button id="cancel-report" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
+            <button id="submit-report" class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">Done</button>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Menu 3 points
+        const profileMenuButton = document.getElementById('profile-menu-button');
+        const profileDropdownMenu = document.getElementById('profile-dropdown-menu');
+
+        if(profileMenuButton && profileDropdownMenu){
+            profileMenuButton.addEventListener('click', function(e){
+                e.stopPropagation();
+                profileDropdownMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function(event){
+                if(!profileMenuButton.contains(event.target) && !profileDropdownMenu.contains(event.target)){
+                    profileDropdownMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Modal
+        const modal = document.getElementById('report-modal');
+        const cancelButton = document.getElementById('cancel-report');
+        const submitButton = document.getElementById('submit-report');
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+        window.openReportModal = function(userId){
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            modal.dataset.userId = userId; // garder l'ID pour envoyer
+        }
+
+        cancelButton.addEventListener('click', function(){
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        submitButton.addEventListener('click', function(){
+            const selected = document.querySelector('input[name="reportReason"]:checked');
+            if(!selected){
+                alert("Veuillez sélectionner un motif.");
+                return;
+            }
+
+            const userId = modal.dataset.userId;
+            const reason = selected.value;
+
+            fetch('/report/submitUser', { // <-- nouvelle route pour utilisateur
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `userId=${userId}&reason=${encodeURIComponent(reason)}`
+            }).then(res => {
+                if(res.ok){
+                    alert("Signalement envoyé !");
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }else{
+                    alert("Erreur lors de l'envoi du signalement.");
+                }
+            }).catch(err => {
+                console.error(err);
+                alert("Erreur lors de l'envoi du signalement.");
+            });
+        });
+    });
+</script>
 
 </body>
 </html>

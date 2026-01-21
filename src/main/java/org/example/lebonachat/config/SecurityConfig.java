@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 "/", "/login", "/register", "/accueil",
                                 "/css/**", "/js/**", "/images/**", "/uploads/**", "/error"
                         ).permitAll()
+                        .requestMatchers("/", "/annonces", "/annonce/*","/search", "/filter/category").permitAll()
                         .requestMatchers("/profil", "/profil/**").authenticated()
                         .requestMatchers("/annonces/**").authenticated()
                         .requestMatchers("/category/new", "/category/save", "/category/delete/**")

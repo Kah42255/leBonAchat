@@ -3,6 +3,7 @@ package org.example.lebonachat.ModuleUser.Presentation;
 import jakarta.validation.Valid;
 import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
 import org.example.lebonachat.ModuleAnnonce.Service.AnnouncementService;
+import org.example.lebonachat.ModuleCategory.Metier.Category;
 import org.example.lebonachat.ModuleCategory.Repository.CategoryRepository;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class userController {
@@ -65,22 +67,47 @@ public class userController {
 
     @GetMapping("/accueil")
     public String accueil(@RequestParam(required = false) Long categoryId, Model model) {
+        System.out.println("DEBUG: /accueil appelé avec categoryId = " + categoryId);
+
+        // 1. Récupérer l'utilisateur connecté
         utilisateur connectedUser = userService.getConnectedUser();
         model.addAttribute("connectedUser", connectedUser);
         model.addAttribute("nom", connectedUser != null ? connectedUser.getNom() : null);
         model.addAttribute("prenom", connectedUser != null ? connectedUser.getPrenom() : null);
 
+        // 2. Récupérer TOUTES les catégories pour la navbar (IMPORTANT)
+        List<Category> categories = categoryRepository.findAll();
+        System.out.println("DEBUG: Nombre de catégories trouvées: " + categories.size());
+        model.addAttribute("categories", categories); // ← CETTE LIGNE MANQUAIT
+
+        // 3. Récupérer les annonces (filtrées ou non)
         List<Announcement> annonces;
+        String categoryNom = null;
+
         if (categoryId != null) {
+            System.out.println("DEBUG: Filtrage par catégorie ID: " + categoryId);
             annonces = announcementService.getByCategoryId(categoryId);
             model.addAttribute("categoryId", categoryId);
+
+            // Récupérer le nom de la catégorie pour l'affichage
+            Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
+            if (categoryOpt.isPresent()) {
+                categoryNom = categoryOpt.get().getNom();
+                model.addAttribute("categoryNom", categoryNom);
+                System.out.println("DEBUG: Nom de catégorie: " + categoryNom);
+            } else {
+                System.out.println("DEBUG: Catégorie non trouvée pour ID: " + categoryId);
+            }
         } else {
+            System.out.println("DEBUG: Affichage de toutes les annonces");
             annonces = announcementService.getAll();
         }
+
+        System.out.println("DEBUG: Nombre d'annonces récupérées: " + annonces.size());
         model.addAttribute("annonces", annonces);
+
         return "accueil";
     }
-
     @GetMapping("/profil")
     public String profilePage(Model model) {
         utilisateur connectedUser = userService.getConnectedUser();

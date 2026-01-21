@@ -54,12 +54,12 @@ public class AnnouncementController {
         return "annonce_form";
     }
 
-    // Enregistrement / Mise à jour d'une annonce
+
     @PostMapping("/annonce/save")
     public String saveAnnonce(@ModelAttribute Announcement annonce,
                               @RequestParam("imageFile") MultipartFile file) {
         try {
-            // Upload image si présent
+
             if (!file.isEmpty()) {
                 Map uploadResult = cloudinary.uploader().upload(
                         file.getBytes(),
@@ -73,11 +73,11 @@ public class AnnouncementController {
             }
 
             if (annonce.getId() == null) {
-                // Nouvelle annonce
+
                 annonce.setCreatedBy(userService.getConnectedUser());
                 service.save(annonce);
             } else {
-                // Modification : récupérer l'annonce existante
+
                 Announcement existing = service.getById(annonce.getId());
                 utilisateur connectedUser = userService.getConnectedUser();
 
@@ -85,7 +85,7 @@ public class AnnouncementController {
                     return "redirect:/annonces"; // sécurité
                 }
 
-                // Mettre à jour uniquement les champs modifiables
+
                 existing.setTitre(annonce.getTitre());
                 existing.setDescription(annonce.getDescription());
                 existing.setPrix(annonce.getPrix());
