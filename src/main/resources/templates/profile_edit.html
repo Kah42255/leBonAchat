@@ -8,32 +8,24 @@
         body {
             font-family: Arial, sans-serif;
             background-color: #f7f7f7;
-            margin: 0;
-            padding: 0;
         }
         .container {
             max-width: 500px;
             margin: 50px auto;
-            background-color: white;
+            background: white;
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
         label {
-            display: block;
             margin-top: 15px;
+            display: block;
             font-weight: bold;
         }
         input {
             width: 100%;
             padding: 8px;
             margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
         }
         .error {
             color: red;
@@ -41,32 +33,38 @@
         }
         button {
             margin-top: 20px;
+            width: 100%;
             padding: 10px;
-            background-color: #3498db;
+            background-color: #c43f6d;
             color: white;
             border: none;
             border-radius: 5px;
-            width: 100%;
-            cursor: pointer;
         }
         button:hover {
-            background-color: #2980b9;
+            background-color: #f8a1bd;
         }
     </style>
 </head>
 
 <body>
+
 <div class="container">
+
+    <!-- Logo -->
+    <div style="text-align:center; margin-bottom:20px;">
+        <img src="/images/logo.png" width="60" alt="Logo">
+        <h2 style="color:#c43f6d;">
+            <span style="font-size:32px;">L</span>ebonachat
+        </h2>
+    </div>
 
     <h2>Modifier Profil</h2>
 
-
-
-        <form th:action="@{/profil/save}" th:object="${user}" method="post">
+    <form th:action="@{/profil/save}" th:object="${user}" method="post">
 
         <input type="hidden"
                th:name="${_csrf.parameterName}"
-               th:value="${_csrf.token}" />
+               th:value="${_csrf.token}">
 
         <label>Nom</label>
         <input type="text" th:field="*{nom}">
@@ -87,7 +85,7 @@
         <button type="submit">Enregistrer</button>
 
     </form>
-
 </div>
+
 </body>
 </html>

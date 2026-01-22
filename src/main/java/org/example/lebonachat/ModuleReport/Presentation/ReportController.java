@@ -47,4 +47,5 @@ public class ReportController {
         }
         return "redirect:/admin/reports";
     }
+
 }

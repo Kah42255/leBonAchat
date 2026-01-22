@@ -80,5 +80,9 @@ public class UserService {
     public utilisateur getById(Long id) {
         Optional<utilisateur> userOpt = userRepository.findById(id);
         return userOpt.orElse(null);
+    }public boolean matches(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
     }
+
+
 }
