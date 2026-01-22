@@ -74,6 +74,15 @@
                 Se connecter
             </a>
         </div>
+        <div class="hidden md:flex space-x-8 mt-2">
+            <a th:href="@{/accueil}" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Accueil</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Immobilier</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Véhicules</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Vacances</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Emploi</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Électronique</a>
+            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
+        </div>
     </div>
 
     <!-- Navigation links -->
@@ -87,6 +96,18 @@
         <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
     </div>
 </nav>
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Liste des Annonces</h2>
+
+    <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
+        <form class="flex flex-1 gap-2" method="get" action="/search">
+            <input type="text" name="keyword"
+                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                   placeholder="Rechercher...">
+            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 font-semibold">
+                Rechercher
+            </button>
+        </form>
 
 <!-- ================= CONTENT ================= -->
 <div class="max-w-7xl mx-auto px-4 py-8">
