@@ -7,6 +7,7 @@ import org.example.lebonachat.ModuleReport.Repository.UserReportRepository;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,4 +37,6 @@ public class UserReportService {
 
         userReportRepository.save(report);
     }
+
+
 }

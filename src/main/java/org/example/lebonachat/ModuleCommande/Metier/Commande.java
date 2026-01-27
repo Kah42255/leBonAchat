@@ -23,6 +23,7 @@ import java.util.List;
         @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
         private List<CommandeAnnonceur> commandesAnnonceur = new ArrayList<>();
 
+
         public double getTotal() {
             return total;
         }

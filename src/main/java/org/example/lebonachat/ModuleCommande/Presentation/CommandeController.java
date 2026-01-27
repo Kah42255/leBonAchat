@@ -11,13 +11,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/commande")
+
 public class CommandeController {
 
     @Autowired
@@ -81,6 +80,41 @@ public class CommandeController {
         model.addAttribute("estAcheteur", estAcheteur);
         model.addAttribute("estAnnonceur", estAnnonceur);
 
-        return "commandeDetails"; // Thymeleaf template
+        return "commande_Details"; // Thymeleaf template
     }
+
+    // li zedthom
+    @PostMapping("/valider/{id}")
+    public String validerCommandeAnnonceur(@PathVariable Long id,
+                                           @AuthenticationPrincipal UserDetails userDetails,
+                                           RedirectAttributes redirectAttributes) {
+
+        utilisateur user = utilisateurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        Commande commande = commandeService.getCommandeById(id);
+
+        commandeService.validerCommandeAnnonceur(commande, user);
+
+        redirectAttributes.addFlashAttribute("message", "Commande validée avec succès.");
+        return "redirect:/commande/details/" + id;
+    }
+
+    @PostMapping("/annuler/{id}")
+    public String annulerCommandeAnnonceur(@PathVariable Long id,
+                                           @RequestParam String cause,
+                                           @AuthenticationPrincipal UserDetails userDetails,
+                                           RedirectAttributes redirectAttributes) {
+
+        utilisateur user = utilisateurRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        Commande commande = commandeService.getCommandeById(id);
+
+        commandeService.annulerCommandeAnnonceur(commande, user, cause);
+
+        redirectAttributes.addFlashAttribute("message", "Commande annulée avec succès.");
+        return "redirect:/commande/details/" + id;
+    }
+
 }

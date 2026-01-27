@@ -60,4 +60,20 @@ public class NotificationService {
         return notificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Notification introuvable"));
     }
+    // lizedteha
+    public void creerNotificationCommande(utilisateur destinataire, Commande commande,
+                                          String titre, String message) {
+
+        Notification notif = new Notification();
+        notif.setUtilisateur(destinataire); // ✅ BON NOM
+        notif.setCommande(commande);
+        notif.setType(NotificationType.COMMANDE);
+        notif.setTitre(titre);
+        notif.setMessage(message);
+        notif.setDateCreation(LocalDateTime.now());
+        notif.setLue(false);
+
+        notificationRepository.save(notif);
+    }
+
 }

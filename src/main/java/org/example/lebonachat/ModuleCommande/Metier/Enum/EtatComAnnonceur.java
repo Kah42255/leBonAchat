@@ -4,6 +4,7 @@ public enum EtatComAnnonceur {
     EN_ATTENTE,
     ACCEPTEE,
     REFUSEE,
+    VALIDEE,
     LIVREE
 }
 

@@ -87,4 +87,34 @@ public class CommandeService {
         return commandeRepository.findById(commandeId)
                 .orElseThrow(() -> new RuntimeException("Commande introuvable : " + commandeId));
     }
+    // pour notification a l'achteur
+    @Transactional
+    public void validerCommandeAnnonceur(Commande commande, utilisateur annonceur) {
+        commande.setEtat(EtatCommande.COMPLETE);
+        // ou enum
+        commandeRepository.save(commande);
+
+        // Notification à l’acheteur
+        notificationService.creerNotificationCommande(
+                commande.getAcheteur(),
+                commande,
+                "Commande validée",
+                "Votre commande #" + commande.getId() + " a été validée par l’annonceur."
+        );
+    }
+
+    @Transactional
+    public void annulerCommandeAnnonceur(Commande commande, utilisateur annonceur, String cause) {
+        commande.setEtat(EtatCommande.EST_ANNULEE);
+
+        commandeRepository.save(commande);
+
+        // Notification à l’acheteur
+        notificationService.creerNotificationCommande(
+                commande.getAcheteur(),
+                commande,
+                "Commande annulée",
+                "Votre commande #" + commande.getId() + " a été annulée. Motif : " + cause
+        );
+    }
 }

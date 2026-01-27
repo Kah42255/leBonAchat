@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
     <title>Accueil - Lebonachat</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -83,51 +84,57 @@
                     <span class="text-sm font-medium text-gray-700" th:text="${connectedUser.nom}">Nom</span>
                 </a>
 
-                <!-- Notifications déroulantes -->
-                <div class="dropdown relative">
-                    <button class="flex flex-col items-center hover:text-[#fd6c9e] group"
-                            type="button"
-                            id="dropdownNotifications"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                        <i class="fa-solid fa-bell text-2xl text-gray-700 group-hover:text-[#fd6c9e]"></i>
-                        <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
-                              th:if="${nbNotificationsNonLues != null and nbNotificationsNonLues > 0}"
-                              th:text="${nbNotificationsNonLues}"></span>
-                        <span class="text-sm text-gray-700">Notifications</span>
-                    </button>
+                    <!-- Notifications déroulantes -->
+<div class="dropdown relative">
+    <button class="flex flex-col items-center hover:text-[#fd6c9e] group"
+            type="button"
+            id="dropdownNotifications"
+            data-bs-toggle="dropdown"
+            aria-expanded="false">
+        <i class="fa-solid fa-bell text-2xl text-gray-700 group-hover:text-[#fd6c9e]"></i>
+        <span id="notif-badge"
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
+              th:if="${nbNotificationsNonLues != null and nbNotificationsNonLues > 0}"
+              th:text="${nbNotificationsNonLues}"></span>
+        <span class="text-sm text-gray-700">Notifications</span>
+    </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end p-2"
-                        aria-labelledby="dropdownNotifications"
-                        style="min-width: 300px; max-height: 400px; overflow-y: auto;">
-                        <li th:if="${notifications == null or #lists.isEmpty(notifications)}"
-                            class="text-center text-gray-500 p-2">
-                            Aucune notification
-                        </li>
+    <ul id="notif-list" class="dropdown-menu dropdown-menu-end p-2"
+        aria-labelledby="dropdownNotifications"
+        style="min-width: 300px; max-height: 400px; overflow-y: auto;">
 
-                        <li th:each="notif : ${notifications}" class="mb-1">
+        <li th:if="${notifications == null or #lists.isEmpty(notifications)}"
+            class="text-center text-gray-500 p-2">
+            Aucune notification
+        </li>
 
-                            <!-- Notification cliquable -->
-<a th:if="${notif.type == 'COMMANDE' and notif.commande != null}"
-   th:href="@{/commande/details/{id}(id=${notif.commande.id})}"
-   class="dropdown-item block w-full px-3 py-2 rounded hover:bg-pink-200 transition cursor-pointer">
-    <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
-    <p th:text="${notif.message != null ? notif.message : 'Message manquant'}"></p>
-    <small class="text-gray-500"
-           th:text="${#temporals.format(notif.dateCreation,'dd/MM/yyyy HH:mm')}"></small>
-</a>
+        <li th:each="notif : ${notifications}" class="mb-1" th:id="'notif-'+${notif.id}">
 
-                            <!-- Notification non cliquable -->
-<div th:if="${connectedUser == null or notif.type != 'COMMANDE' or notif.commande == null}"
-     class="dropdown-item block w-full px-3 py-2 text-gray-400 non-clickable">
-    <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
-    <p th:text="${notif.message != null ? notif.message : 'Message manquant'}"></p>
+            <!-- Notification cliquable -->
+            <a th:if="${notif.type == 'COMMANDE' and notif.commande != null}"
+               href="#"
+               th:data-id="${notif.id}"
+               th:data-commande-id="${notif.commande.id}"
+               class="notification-link dropdown-item block w-full px-3 py-2 rounded hover:bg-pink-200 cursor-pointer">
+                <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
+                <p th:text="${notif.message != null ? notif.message : 'Message manquant'}"></p>
+                <small class="text-gray-500"
+                       th:text="${#temporals.format(notif.dateCreation,'dd/MM/yyyy HH:mm')}"></small>
+            </a>
+
+            <!-- Notification non cliquable -->
+            <a href="#"
+            th:data-id="${notif.id}"
+            th:data-commande-id="${notif.commande != null ? notif.commande.id : ''}"
+            class="notification-link dropdown-item block w-full px-3 py-2 rounded hover:bg-pink-200 cursor-pointer">
+            <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
+            <p th:text="${notif.message != null ? notif.message : 'Message manquant'}"></p>
+             </a>
+
+
+        </li>
+    </ul>
 </div>
-
-
-                        </li>
-                    </ul>
-                </div>
 
                 <!-- Panier -->
                 <a th:href="@{/panier}" class="flex flex-col items-center hover:text-[#fd6c9e] group">
@@ -200,37 +207,38 @@
 
 <!-- ================= JS ================= -->
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".dropdown-item.cursor-pointer").forEach(function(elem) {
-            elem.addEventListener("click", function(event) {
-                event.preventDefault();
+    document.addEventListener("DOMContentLoaded", function () {
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const badge = document.getElementById("notif-badge");
+        const notifList = document.getElementById("notif-list");
+
+        document.querySelectorAll(".notification-link").forEach(link => {
+            link.addEventListener("click", function () {
                 const notifId = this.dataset.id;
                 const commandeId = this.dataset.commandeId;
 
+                // Redirection immédiate
+                window.location.href = `/commande/details/${commandeId}`;
+
+                // AJAX pour marquer comme lue
                 fetch(`/notification/marquer-lue/${notifId}`, {
                     method: "POST",
                     headers: {
-                        "X-CSRF-TOKEN": /*[[${_csrf.token}]]*/,
-                        "Content-Type": "application/json"
+                        "X-CSRF-TOKEN": csrfToken
                     }
                 })
                     .then(response => response.json())
                     .then(data => {
                         // Met à jour le badge
-                        const badge = document.querySelector("#dropdownNotifications span.bg-red-500");
                         if (badge) {
-                            if (data.nbNonLues > 0) {
-                                badge.textContent = data.nbNonLues;
-                            } else {
-                                badge.remove();
-                            }
+                            badge.textContent = data.nbNonLues;
+                            if (data.nbNonLues === 0) badge.style.display = "none";
                         }
-                        // Redirection vers la page commande si nécessaire
-                        if (data.type === "COMMANDE" && data.commandeId) {
-                            window.location.href = "/commande/details/" + data.commandeId;
-                        }
+                        // Supprime la notification du menu
+                        const notifItem = document.getElementById('notif-' + notifId);
+                        if (notifItem) notifItem.remove();
                     })
-                    .catch(err => console.error("Erreur:", err));
+                    .catch(err => console.error("Erreur notification:", err));
             });
         });
     });

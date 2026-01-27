@@ -94,4 +94,6 @@ public class ReportService {
 
         return hasUserAlreadyReported(announcement, user);
     }
+
+
 }
