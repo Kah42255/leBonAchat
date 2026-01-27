@@ -35,4 +35,20 @@ public class Announcement {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private utilisateur createdBy;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public utilisateur getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(utilisateur createdBy) {
+        this.createdBy = createdBy;
+    }
 }

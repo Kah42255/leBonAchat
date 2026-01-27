@@ -5,6 +5,8 @@ import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
 import org.example.lebonachat.ModuleAnnonce.Service.AnnouncementService;
 import org.example.lebonachat.ModuleCategory.Metier.Category;
 import org.example.lebonachat.ModuleCategory.Repository.CategoryRepository;
+import org.example.lebonachat.ModuleNotification.Metier.Notification;
+import org.example.lebonachat.ModuleNotification.Service.NotificationService;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,13 +18,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+
+
 @Controller
 public class userController {
 
     private final UserService userService;
     private final AnnouncementService announcementService;
     private final CategoryRepository categoryRepository;
-
+@Autowired
+private NotificationService notificationService;
     @Autowired
     public userController(UserService userService,
                           AnnouncementService announcementService,
@@ -66,21 +71,27 @@ public class userController {
     }
 
     @GetMapping("/accueil")
+
     public String accueil(@RequestParam(required = false) Long categoryId, Model model) {
         System.out.println("DEBUG: /accueil appelé avec categoryId = " + categoryId);
 
-        // 1. Récupérer l'utilisateur connecté
+        // 1️⃣ Récupérer l'utilisateur connecté
         utilisateur connectedUser = userService.getConnectedUser();
         model.addAttribute("connectedUser", connectedUser);
         model.addAttribute("nom", connectedUser != null ? connectedUser.getNom() : null);
         model.addAttribute("prenom", connectedUser != null ? connectedUser.getPrenom() : null);
 
-        // 2. Récupérer TOUTES les catégories pour la navbar (IMPORTANT)
+        // ⚡ Charger le panier et ses lignes pour que le badge s'incrémente
+        if (connectedUser != null && connectedUser.getPanier() != null) {
+            connectedUser.getPanier().getLignes().size(); // force le chargement des lignes
+        }
+
+        // 2️⃣ Récupérer toutes les catégories pour la navbar
         List<Category> categories = categoryRepository.findAll();
         System.out.println("DEBUG: Nombre de catégories trouvées: " + categories.size());
-        model.addAttribute("categories", categories); // ← CETTE LIGNE MANQUAIT
+        model.addAttribute("categories", categories);
 
-        // 3. Récupérer les annonces (filtrées ou non)
+        // 3️⃣ Récupérer les annonces (filtrées par catégorie si besoin)
         List<Announcement> annonces;
         String categoryNom = null;
 
@@ -89,7 +100,6 @@ public class userController {
             annonces = announcementService.getByCategoryId(categoryId);
             model.addAttribute("categoryId", categoryId);
 
-            // Récupérer le nom de la catégorie pour l'affichage
             Optional<Category> categoryOpt = categoryRepository.findById(categoryId);
             if (categoryOpt.isPresent()) {
                 categoryNom = categoryOpt.get().getNom();
@@ -106,8 +116,18 @@ public class userController {
         System.out.println("DEBUG: Nombre d'annonces récupérées: " + annonces.size());
         model.addAttribute("annonces", annonces);
 
+        // 4️⃣ Notifications
+        if (connectedUser != null) {
+            List<Notification> notifications = notificationService.getNotificationsForUser(connectedUser);
+            long nbNotificationsNonLues = notifications.stream().filter(n -> !n.getLue()).count();
+
+            model.addAttribute("notifications", notifications);
+            model.addAttribute("nbNotificationsNonLues", nbNotificationsNonLues);
+        }
+
         return "accueil";
     }
+
     @GetMapping("/profil")
     public String profilePage(Model model) {
         utilisateur connectedUser = userService.getConnectedUser();

@@ -20,8 +20,17 @@ public class LignePanier {
         this.annonce = annonce;
         this.quantite = quantite;
     }
-
+    @ManyToOne
+    private Panier panier;
     public LignePanier() {
+    }
+
+    public Panier getPanier() {
+        return panier;
+    }
+
+    public void setPanier(Panier panier) {
+        this.panier = panier;
     }
 
     public Long getId() {
@@ -47,4 +56,5 @@ public class LignePanier {
     public void setQuantite(int quantite) {
         this.quantite = quantite;
     }
+
 }

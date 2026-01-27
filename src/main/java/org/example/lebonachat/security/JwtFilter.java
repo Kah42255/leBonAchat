@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -31,6 +32,15 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain chain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+
+        if (!path.startsWith("/api/")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // 🔐 JWT uniquement pour /api/**
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
@@ -49,6 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
+
         chain.doFilter(request, response);
     }
 }

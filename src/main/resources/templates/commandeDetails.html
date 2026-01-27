@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Détails de la commande</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f7f7f7; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background-color: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #fd6c9e; text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #fd6c9e; color: white; }
+        .total { text-align: right; font-weight: bold; font-size: 1.2em; color: #fd6c9e; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Détails de la commande</h2>
+
+    <p><strong>Utilisateur :</strong> <span th:text="${commande.acheteur.nom} + ' ' + ${commande.acheteur.prenom}"></span></p>
+    <p><strong>Email :</strong> <span th:text="${commande.acheteur.email}"></span></p>
+
+    <h4>Articles commandés :</h4>
+    <table>
+        <thead>
+        <tr>
+            <th>Annonce</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="ligne : ${commande.lignes}">
+            <td th:text="${ligne.annonce.titre}">Titre</td>
+            <td th:text="${ligne.quantite}">1</td>
+            <td th:text="${ligne.annonce.prix} + ' DA'">0 DA</td>
+            <td th:text="${ligne.annonce.prix * ligne.quantite} + ' DA'">0 DA</td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="total">
+        Total commande : <span th:text="${commande.total}">0 DA</span>
+    </div>
+</div>
+</body>
+</html>
