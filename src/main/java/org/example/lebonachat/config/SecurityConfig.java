@@ -25,40 +25,33 @@ public class SecurityConfig {
         this.jwtFilter = jwtFilter;
     }
 
-    // 🔑 Password encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // 🔑 AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // 🔒 Security filter chain
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
-                // Autoriser certaines pages pour tous
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/", "/login", "/register", "/accueil",
-                                "/css/**", "/js/**", "/images/**", "/uploads/**", "/error"
-                        ).permitAll()
-                        .requestMatchers("/", "/annonces", "/annonce/*","/search", "/filter/category").permitAll()
-                        .requestMatchers("/profil", "/profil/**").authenticated()
-                        .requestMatchers("/annonces/**").authenticated()
-                        .requestMatchers("/category/new", "/category/save", "/category/delete/**")
-                        .hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/category/list").permitAll()
-                        .requestMatchers("/api/**").permitAll() // Flutter API
+                        // Pages publiques
+                        .requestMatchers("/", "/login", "/register", "/accueil", "/css/**", "/js/**", "/images/**", "/uploads/**", "/error").permitAll()
+                        .requestMatchers("/annonces/**", "/annonce/*", "/search", "/filter/category", "/category/list", "/api/**").permitAll()
+
+                        // Pages utilisateurs connectés
+                        .requestMatchers("/profil/**", "/panier/**", "/notification/**", "/commande/details/**").authenticated()
+
+                        // Pages admin
+                        .requestMatchers("/category/new", "/category/save", "/category/delete/**").hasAuthority("ROLE_ADMIN")
+
+                        // Toute autre requête nécessite authentification
                         .anyRequest().authenticated()
                 )
-
-                // Login web
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
@@ -68,23 +61,13 @@ public class SecurityConfig {
                         .failureUrl("/login?error")
                         .permitAll()
                 )
-
-                // Logout web
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/accueil")
                         .permitAll()
                 )
-
-                // CSRF
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/**") // Ignore CSRF pour API Flutter
-                )
-
-                // JWT Filter pour API
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-
-                // UserDetailsService
                 .userDetailsService(userDetailsService);
 
         return http.build();
