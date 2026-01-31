@@ -92,5 +92,9 @@ public class UserService {
         return findAdmin();
     }
 
-
+    @Transactional
+    public void deleteUser(Long id) {
+        utilisateur user = getById(id); // vérifie que l'utilisateur existe
+        userRepository.delete(user);
+    }
 }

@@ -84,7 +84,11 @@ public class AnnouncementService {
 
         });
     }
-
+    @Transactional
+    public void deleteAnnouncement(Long id) {
+        Announcement annonce = getById(id); // vérifie que l'annonce existe
+        repo.delete(annonce);
+    }
     @Transactional
     public void annulerAnnonce(Long id, String causeAnnulation) {
         repo.findById(id).ifPresent(annonce -> {

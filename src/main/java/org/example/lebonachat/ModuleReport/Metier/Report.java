@@ -18,7 +18,7 @@ public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+   private Long ReportCount;
     @ManyToOne
     @JoinColumn(name = "announcement_id", nullable = false)
     private Announcement announcement;
@@ -44,5 +44,13 @@ public class Report {
     protected void onCreate() {
         reportedAt = LocalDateTime.now();
         status = ReportStatus.PENDING;
+    }
+
+    public long getReportCount() {
+        return ReportCount;
+    }
+
+    public void setReportCount(Long reportCount) {
+        ReportCount = reportCount;
     }
 }

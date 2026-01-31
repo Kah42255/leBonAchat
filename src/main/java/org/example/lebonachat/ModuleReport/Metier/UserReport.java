@@ -19,7 +19,7 @@ public class UserReport {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private Long ReportCount;
     // L'utilisateur signalé
     @ManyToOne
     @JoinColumn(name = "reported_user_id", nullable = false)
@@ -47,6 +47,14 @@ public class UserReport {
     protected void onCreate() {
         reportedAt = LocalDateTime.now();
         status = ReportStatus.PENDING;
+    }
+
+    public Long getReportCount() {
+        return ReportCount;
+    }
+
+    public void setReportCount(Long reportCount) {
+        ReportCount = reportCount;
     }
 }
 
