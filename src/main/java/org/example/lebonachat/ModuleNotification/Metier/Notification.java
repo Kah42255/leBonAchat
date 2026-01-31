@@ -13,14 +13,15 @@ public class Notification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String lien;
     private String message;
     private String titre;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private NotificationType type;
 
-    private LocalDateTime dateCreation;
+    private LocalDateTime dateCreation=LocalDateTime.now();;
 
     private Boolean lue = false;
 
@@ -38,6 +39,14 @@ public class Notification {
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
+    public String getLien() {
+        return lien;
+    }
+
+    public void setLien(String lien) {
+        this.lien = lien;
+    }
 
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }

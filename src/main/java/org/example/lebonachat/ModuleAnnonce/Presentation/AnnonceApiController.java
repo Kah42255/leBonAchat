@@ -1,6 +1,7 @@
 package org.example.lebonachat.ModuleAnnonce.Presentation;
 
 import lombok.RequiredArgsConstructor;
+
 import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
 import org.example.lebonachat.ModuleAnnonce.Service.AnnouncementService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class AnnonceApiController {
     // Filtrer par catégorie
     @GetMapping("/filter/category")
     public List<Announcement> filterByCategory(@RequestParam Long categoryId) {
-        return service.filterByCategory(categoryId);
+        return service.getByCategoryId(categoryId);
     }
 }
 

@@ -85,29 +85,76 @@
 
             <div class="details-section">
                 <div class="info-card">
-                    <div class="annonce-info"><span class="annonce-label">Prix :</span><span class="annonce-value" th:text="${annonce.prix} + ' DA'"></span></div>
-                    <div class="annonce-info"><span class="annonce-label">Description :</span><span class="annonce-value" th:text="${annonce.description}"></span></div>
-                    <div class="annonce-info"><span class="annonce-label">Ville :</span><span class="annonce-value" th:text="${annonce.ville}"></span></div>
-                    <div class="annonce-info"><span class="annonce-label">Catégorie :</span><span class="annonce-value" th:text="${annonce.category.nom}"></span></div>
-                    <div class="annonce-info"><span class="annonce-label">Date de création :</span><span class="annonce-value" th:text="${annonce.date}"></span></div>
-                    <div class="annonce-info"><span class="annonce-label">Créé par :</span>
+                    <!-- Prix ou Société -->
+                    <!-- Pour toutes les catégories sauf Offre d'Emploi -->
+                    <div th:if="${annonce.category.nom != 'Offre d''Emploi'}">
+                        <span>Prix :</span>
+                        <span th:text="${annonce.prix}"></span>
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Description :</span>
+                        <span class="annonce-value" th:text="${annonce.description}"></span>
+                    </div>
+
+                    <!-- Ville -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Ville :</span>
+                        <span class="annonce-value" th:text="${annonce.ville}"></span>
+                    </div>
+
+                    <!-- Catégorie -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Catégorie :</span>
+                        <span class="annonce-value" th:text="${annonce.category.nom}"></span>
+                    </div>
+
+                    <!-- Date de création -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Date de création :</span>
+                        <span class="annonce-value" th:text="${#temporals.format(annonce.date, 'dd/MM/yyyy')}"></span>
+                    </div>
+
+                    <!-- Créé par -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Créé par :</span>
                         <span class="annonce-value">
-                          <a th:href="@{/profil/{id}(id=${annonce.createdBy.id})}" class="text-blue-600 hover:underline" th:text="${annonce.createdBy.email}">abc@usdb.dz</a>
-                        </span>
+            <a th:href="@{/profil/{id}(id=${annonce.createdBy.id})}"
+               class="text-blue-600 hover:underline"
+               th:text="${annonce.createdBy.email}">abc@usdb.dz</a>
+        </span>
                     </div>
+                </div>
 
-                    <div class="action-buttons">
+
+
+                <div class="action-buttons flex gap-2">
                         <a th:href="@{/annonces}" class="btn-retour">Retour</a>
-                        <a><form th:if="${connectedUser != null}" th:action="@{/panier/ajouter/{id}(id=${a.id})}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                            <button class="w-full px-3 py-2 bg-[#d94b7c] text-white rounded hover:bg-[#c43f6d] font-semibold">
-                                Ajouter au panier
-                            </button>
-                        </form></a>
-                        <a th:if="${user != null and user.id == annonce.createdBy.id}" th:href="@{/annonce/modifier/{id}(id=${annonce.id})}" class="btn-modifier">Modifier</a>
-                        <a th:if="${user != null and user.id == annonce.createdBy.id}" th:href="@{/annonce/delete/{id}(id=${annonce.id})}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')" class="btn-supprimer">Supprimer</a>
 
+                        <a>
+                            <form th:if="${connectedUser != null}" th:action="@{/panier/ajouter/{id}(id=${a.id})}" method="post">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button class="w-full px-3 py-2 bg-[#d94b7c] text-white rounded hover:bg-[#c43f6d] font-semibold">
+                                    Ajouter au panier
+                                </button>
+                            </form>
+                        </a>
+
+                        <!-- Boutons Modifier et Supprimer côte à côte -->
+                        <div th:if="${user != null and user.id == annonce.createdBy.id}" class="flex gap-2">
+                            <a th:href="@{/annonce/modifier/{id}(id=${annonce.id})}" class="btn-modifier">Modifier</a>
+
+                            <form th:action="@{/annonce/delete/{id}(id=${annonce.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn-supprimer">Supprimer</button>
+                            </form>
+                        </div>
                     </div>
+
 
                 </div>
             </div>

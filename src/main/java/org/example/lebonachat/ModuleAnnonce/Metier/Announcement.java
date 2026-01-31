@@ -2,6 +2,7 @@ package org.example.lebonachat.ModuleAnnonce.Metier;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.lebonachat.ModuleAnnonce.Metier.Enum.EtatAnnonce;
 import org.example.lebonachat.ModuleCategory.Metier.Category;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 
@@ -16,9 +17,16 @@ public class Announcement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EtatAnnonce etat = EtatAnnonce.EN_ATTENTE;
 
     private String titre;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String description;
+
     private double prix;
     private String ville;
     private String imagePath;
@@ -50,5 +58,14 @@ public class Announcement {
 
     public void setCreatedBy(utilisateur createdBy) {
         this.createdBy = createdBy;
+    }
+
+
+    public EtatAnnonce getEtat() {
+        return etat;
+    }
+
+    public void setEtat(EtatAnnonce etat) {
+        this.etat = etat;
     }
 }

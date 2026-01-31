@@ -20,6 +20,9 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
+    // ==============================
+    // 🔔 NOTIFICATION COMMANDE
+    // ==============================
     @Transactional
     public void creerNotificationCommande(utilisateur destinataire, Commande commande) {
         Notification notification = new Notification();
@@ -27,14 +30,52 @@ public class NotificationService {
         notification.setCommande(commande);
         notification.setDateCreation(LocalDateTime.now());
         notification.setLue(false);
-        notification.setMessage("Vous avez reçu une nouvelle commande de " + commande.getAcheteur().getNom());
+        notification.setMessage("Vous avez reçu une nouvelle commande de " +
+                commande.getAcheteur().getNom());
         notification.setTitre("Nouvelle commande");
         notification.setType(NotificationType.COMMANDE);
 
         notificationRepository.save(notification);
     }
 
-    // 🔹 Charger toutes les notifications avec les commandes
+    // version personnalisée (OK)
+    @Transactional
+    public void creerNotificationCommande(utilisateur destinataire, Commande commande,
+                                          String titre, String message) {
+
+        Notification notif = new Notification();
+        notif.setUtilisateur(destinataire);
+        notif.setCommande(commande);
+        notif.setType(NotificationType.COMMANDE);
+        notif.setTitre(titre);
+        notif.setMessage(message);
+        notif.setDateCreation(LocalDateTime.now());
+        notif.setLue(false);
+
+        notificationRepository.save(notif);
+    }
+
+    // ==============================
+    // 🔔 NOTIFICATION SIMPLE (ANNONCE)
+    // ==============================
+    @Transactional
+    public void creerNotificationSimple(Notification notification) {
+
+        if (notification.getType() == null) {
+            throw new RuntimeException("NotificationType est obligatoire");
+        }
+
+        if (notification.getDateCreation() == null) {
+            notification.setDateCreation(LocalDateTime.now());
+        }
+
+        notification.setLue(false);
+        notificationRepository.save(notification);
+    }
+
+    // ==============================
+    // 📥 CONSULTATION
+    // ==============================
     public List<Notification> getNotificationsForUser(utilisateur user) {
         return notificationRepository.findByUtilisateurWithCommande(user);
     }
@@ -60,20 +101,4 @@ public class NotificationService {
         return notificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Notification introuvable"));
     }
-    // lizedteha
-    public void creerNotificationCommande(utilisateur destinataire, Commande commande,
-                                          String titre, String message) {
-
-        Notification notif = new Notification();
-        notif.setUtilisateur(destinataire); // ✅ BON NOM
-        notif.setCommande(commande);
-        notif.setType(NotificationType.COMMANDE);
-        notif.setTitre(titre);
-        notif.setMessage(message);
-        notif.setDateCreation(LocalDateTime.now());
-        notif.setLue(false);
-
-        notificationRepository.save(notif);
-    }
-
 }
