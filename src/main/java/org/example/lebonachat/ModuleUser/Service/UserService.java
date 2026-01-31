@@ -83,6 +83,18 @@ public class UserService {
     }public boolean matches(String rawPassword, String encodedPassword) {
         return passwordEncoder.matches(rawPassword, encodedPassword);
     }
+    public utilisateur findAdmin() {
+        return userRepository.findFirstByRole(Role.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Admin introuvable"));
+    }
 
+    public utilisateur getAdminUser() {
+        return findAdmin();
+    }
 
+    @Transactional
+    public void deleteUser(Long id) {
+        utilisateur user = getById(id); // vérifie que l'utilisateur existe
+        userRepository.delete(user);
+    }
 }

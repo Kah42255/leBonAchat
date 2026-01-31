@@ -30,7 +30,12 @@
 
         <!-- Champ caché pour l'ID (essentiel pour la modification) -->
         <input type="hidden" th:field="*{id}" />
-
+        <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            <select id="categorySelect" th:field="*{category.id}" class="form-select" required>
+                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.nom}"></option>
+            </select>
+        </div>
         <div class="mb-3">
             <label class="form-label">Titre</label>
             <input type="text" th:field="*{titre}" class="form-control" required>
@@ -43,7 +48,7 @@
 
         <div class="mb-3">
             <label class="form-label">Prix</label>
-            <input type="number" th:field="*{prix}" class="form-control" required>
+            <input type="number" th:field="*{prix}" id="prixField" class="form-control" required>
         </div>
 
         <div class="mb-3">
@@ -51,12 +56,7 @@
             <input type="text" th:field="*{ville}" class="form-control" required>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Catégorie</label>
-            <select th:field="*{category.id}" class="form-select" required>
-                <option th:each="c : ${categories}" th:value="${c.id}" th:text="${c.nom}"></option>
-            </select>
-        </div>
+
 
         <div class="mb-3">
             <label class="form-label">Image</label>
@@ -74,6 +74,28 @@
         </button>
     </form>
 </div>
+<script>
+    const categorySelect = document.getElementById('categorySelect');
+    const prixField = document.getElementById('prixField');
+
+    function togglePrix() {
+        // Récupère le texte de la catégorie sélectionnée
+        const selectedText = categorySelect.options[categorySelect.selectedIndex].text;
+
+        if (selectedText === "Offre d'Emploi") {
+            prixField.disabled = true;   // rend le champ grisé
+            prixField.value = '';        // vide le prix si nécessaire
+        } else {
+            prixField.disabled = false;  // réactive le champ
+        }
+    }
+
+    // Écoute le changement de sélection
+    categorySelect.addEventListener('change', togglePrix);
+
+    // Applique l'état au chargement de la page
+    window.addEventListener('load', togglePrix);
+</script>
 
 </body>
 </html>

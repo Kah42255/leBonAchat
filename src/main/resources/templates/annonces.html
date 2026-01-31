@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des annonces</title>
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-
 <body class="bg-gray-50 min-h-screen">
 
 <!-- ================= NAVBAR ================= -->
@@ -18,10 +17,7 @@
 
         <!-- Logo -->
         <a href="/accueil" class="flex items-center gap-3">
-            <img src="/images/logo.png"
-                 alt="Logo"
-                 class="w-10 h-10 object-contain">
-
+            <img src="/images/logo.png" alt="Logo" class="w-10 h-10 object-contain">
             <span class="text-3xl font-extrabold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
                 <span class="text-4xl">L</span>ebonachat
             </span>
@@ -29,7 +25,6 @@
 
         <!-- Right actions -->
         <div class="flex items-center gap-6">
-
             <!-- Connected user -->
             <div th:if="${connectedUser != null}" class="flex items-center gap-6">
 
@@ -40,8 +35,7 @@
                                     flex items-center justify-center text-white font-semibold">
                             <span th:text="${#strings.toUpperCase(#strings.substring(connectedUser.nom,0,1))}"></span>
                         </div>
-                        <div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500
-                                    rounded-full border-2 border-white"></div>
+                        <div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
                     <span class="text-sm text-gray-700" th:text="${connectedUser.nom}"></span>
                 </a>
@@ -51,9 +45,7 @@
                     <div class="relative">
                         <i class="fa-solid fa-cart-shopping text-2xl text-gray-700"></i>
                         <span class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
-                              th:text="${connectedUser.panier != null ? connectedUser.panier.lignes.size() : 0}">
-                            0
-                        </span>
+                              th:text="${connectedUser.panier != null ? connectedUser.panier.lignes.size() : 0}">0</span>
                     </div>
                     <span class="text-sm text-gray-700">Panier</span>
                 </a>
@@ -61,8 +53,7 @@
                 <!-- Logout -->
                 <form th:action="@{/logout}" method="post">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit"
-                            class="px-4 py-2 bg-[#FF8DA1] text-white rounded-md hover:bg-[#FF6C9E] font-semibold">
+                    <button type="submit" class="px-4 py-2 bg-[#FF8DA1] text-white rounded-md hover:bg-[#FF6C9E] font-semibold">
                         Se déconnecter
                     </button>
                 </form>
@@ -73,15 +64,6 @@
                class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold">
                 Se connecter
             </a>
-        </div>
-        <div class="hidden md:flex space-x-8 mt-2">
-            <a th:href="@{/accueil}" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Accueil</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Immobilier</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Véhicules</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Vacances</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Emploi</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Électronique</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
         </div>
     </div>
 
@@ -96,28 +78,13 @@
         <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
     </div>
 </nav>
+
+<!-- ================= MAIN CONTENT ================= -->
 <div class="max-w-7xl mx-auto px-4 py-8">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Liste des Annonces</h2>
 
+    <!-- Search & Filter -->
     <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
-        <form class="flex flex-1 gap-2" method="get" action="/search">
-            <input type="text" name="keyword"
-                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
-                   placeholder="Rechercher...">
-            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 font-semibold">
-                Rechercher
-            </button>
-        </form>
-
-<!-- ================= CONTENT ================= -->
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">
-        Liste des Annonces
-    </h2>
-
-    <!-- Search / Filter -->
-    <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
-
         <form class="flex flex-1 gap-2" method="get" action="/search">
             <input type="text" name="keyword"
                    placeholder="Rechercher..."
@@ -128,55 +95,49 @@
         </form>
 
         <form action="/filter/category" method="get" class="flex gap-2">
-            <select name="categoryId"
-                    class="px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-400">
+            <select name="categoryId" class="px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-400">
                 <option value="0">Toutes les catégories</option>
-                <option th:each="cat : ${categories}"
-                        th:value="${cat.id}"
-                        th:text="${cat.nom}">
-                </option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.nom}"></option>
             </select>
-            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa]">
+            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold">
                 Filtrer
             </button>
         </form>
 
-        <a href="/annonce/new"
-           class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold text-center">
+        <a href="/annonce/new" class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold text-center">
             + Nouvelle annonce
         </a>
     </div>
-</div>
 
-<!-- ================= GRID ================= -->
-<div class="max-w-7xl mx-auto px-4 pb-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <!-- ================= GRID ================= -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div th:each="a : ${annonces}"
+             th:if="${a.etat.equals(T(org.example.lebonachat.ModuleAnnonce.Metier.Enum.EtatAnnonce).VALIDE)
+         or (connectedUser != null and connectedUser.role.name() == 'ROLE_ADMIN')}"
 
-    <div th:each="a : ${annonces}" class="bg-white shadow-md rounded-lg overflow-hidden">
+             class="bg-white shadow-md rounded-lg overflow-hidden">
 
-        <img th:if="${a.imagePath != null}"
-             th:src="@{${a.imagePath}}"
-             class="w-full h-48 object-cover"/>
 
-        <div class="p-4">
-            <h3 class="text-lg font-bold mb-2" th:text="${a.titre}"></h3>
-            <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
+        <img th:if="${a.imagePath != null}" th:src="@{${a.imagePath}}" class="w-full h-48 object-cover"/>
 
-            <p><strong>Prix :</strong> <span th:text="${a.prix}"></span> DA</p>
-            <p class="mb-4"><strong>Ville :</strong> <span th:text="${a.ville}"></span></p>
+            <div class="p-4">
+                <h3 class="text-lg font-bold mb-2" th:text="${a.titre}"></h3>
+               <!-- <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
+                <p><strong>Prix :</strong> <span th:text="${a.prix}"></span> DA</p>
+                <p class="mb-4"><strong>Ville :</strong> <span th:text="${a.ville}"></span></p>-->
 
-            <a th:href="@{/annonce/{id}(id=${a.id})}"
-               class="block text-center px-3 py-2 bg-[#fd6c9e] text-white rounded hover:bg-[#f18baa] font-semibold mb-2">
-                Voir détails
-            </a>
+                <a th:href="@{/annonce/{id}(id=${a.id})}"
+                   class="block text-center px-3 py-2 bg-[#fd6c9e] text-white rounded hover:bg-[#f18baa] font-semibold mb-2">
+                    Voir détails
+                </a>
 
-            <form th:if="${connectedUser != null}"
-                  th:action="@{/panier/ajouter/{id}(id=${a.id})}"
-                  method="post">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button class="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 font-semibold">
-                    Au panier
-                </button>
-            </form>
+                <form th:if="${connectedUser != null}" th:action="@{/panier/ajouter/{id}(id=${a.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button class="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 font-semibold">
+                        Au panier
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

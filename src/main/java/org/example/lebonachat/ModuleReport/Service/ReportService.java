@@ -3,8 +3,11 @@ package org.example.lebonachat.ModuleReport.Service;
 import lombok.RequiredArgsConstructor;
 import org.example.lebonachat.ModuleAnnonce.Metier.Announcement;
 import org.example.lebonachat.ModuleAnnonce.Service.AnnouncementService;
+import org.example.lebonachat.ModuleNotification.Metier.Notification;
+import org.example.lebonachat.ModuleNotification.Metier.NotificationType;
+import org.example.lebonachat.ModuleNotification.Service.NotificationService;
 import org.example.lebonachat.ModuleReport.Metier.Report;
-import org.example.lebonachat.ModuleReport.Metier.ReportStatus; // Import ajouté
+import org.example.lebonachat.ModuleReport.Metier.ReportStatus;
 import org.example.lebonachat.ModuleReport.Repository.ReportRepository;
 import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
@@ -21,7 +24,7 @@ public class ReportService {
     private final ReportRepository reportRepository;
     private final UserService userService;
     private final AnnouncementService announcementService;
-
+    private final NotificationService notificationService;
     public Report reportAnnouncement(Long announcementId, String reason) {
         utilisateur reporter = userService.getConnectedUser();
         if (reporter == null) {
@@ -51,8 +54,17 @@ public class ReportService {
                 .status(ReportStatus.PENDING) // Correction ici
                 .reportedAt(LocalDateTime.now())
                 .build();
+        Report savedReport = reportRepository.save(report);
 
-        return reportRepository.save(report);
+
+        Notification notif = new Notification();
+        notif.setUtilisateur(userService.getAdminUser()); // Méthode pour récupérer l’admin
+        notif.setType(NotificationType.ANNONCE);
+        notif.setTitre("Annonce signalée");
+        notif.setMessage("L’annonce '" + announcement.getTitre() + "' a été signalée pour : " + reason);
+        notif.setLien("/admin/gerer_report/annonce/" + savedReport.getId()); // lien vers la gestion
+        notificationService.creerNotificationSimple(notif);
+        return savedReport ;
     }
 
     public boolean hasUserAlreadyReported(Announcement announcement, utilisateur reporter) {
@@ -95,5 +107,31 @@ public class ReportService {
         return hasUserAlreadyReported(announcement, user);
     }
 
+    public Report getAnnouncementReportsById(Long reportId) {
+        return reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Signalement non trouvé"));
+    }
+
+    @Transactional
+    public void deleteAnnouncement(Long announcementId) {
+        Announcement annonce = announcementService.getById(announcementId);
+        if (annonce != null) {
+            announcementService.deleteAnnouncement(announcementId);
+        }
+    }
+
+    @Transactional
+    public void addAdminComment(Long reportId, String comment) {
+        Report report = getAnnouncementReportsById(reportId);
+        report.setAdminComment(comment);
+        reportRepository.save(report);
+    }
+    public long getAnnouncementReportCount(Long announcementId) {
+        return reportRepository.countReportsByAnnouncement(announcementId);
+    }
+
+    public List<Report> getAllAnnouncementReports() {
+        return reportRepository.findAll();
+    }
 
 }

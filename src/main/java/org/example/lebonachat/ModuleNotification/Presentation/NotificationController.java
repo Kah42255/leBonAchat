@@ -55,4 +55,12 @@ public class NotificationController {
             this.nbNonLues = nbNonLues;
         }
     }
+    @GetMapping("/click/{id}")
+    public String handleNotificationClick(@PathVariable Long id) {
+        Notification notif = notificationService.getNotificationById(id);
+        notificationService.marquerCommeLue(id, notif.getUtilisateur());
+
+        return "redirect:" + notif.getLien();
+    }
+
 }
