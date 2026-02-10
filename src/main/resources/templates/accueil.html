@@ -55,6 +55,10 @@
                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold">
                         Gérer les annonces
                     </a>
+                    <a href="/admin/gerer_report/reports" class="btn btn-warning">
+                        🚨 Gérer les signalements
+                    </a>
+
                 </th:block>
 
                 <!-- UTILISATEUR -->
@@ -105,35 +109,42 @@
                         </div>
                         <span class="text-sm font-medium text-gray-700" th:text="${connectedUser.nom}">Nom</span>
                     </a>
+                    <!-- notification -->
+               <div class="dropdown relative">
+    <button class="flex flex-col items-center hover:text-pink-500 group"
+            type="button" id="dropdownNotifications"
+            data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="fa-solid fa-bell text-2xl text-gray-700 group-hover:text-pink-500"></i>
+        <span id="notif-badge"
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
+              th:if="${nbNotificationsNonLues != null and nbNotificationsNonLues > 0}"
+              th:text="${nbNotificationsNonLues}"></span>
+    </button>
 
-                    <!-- Notifications déroulantes -->
-                    <div class="dropdown relative">
-                        <button class="flex flex-col items-center hover:text-pink-500 group"
-                                type="button" id="dropdownNotifications"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fa-solid fa-bell text-2xl text-gray-700 group-hover:text-pink-500"></i>
-                            <span id="notif-badge"
-                                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
-                                  th:if="${nbNotificationsNonLues != null and nbNotificationsNonLues > 0}"
-                                  th:text="${nbNotificationsNonLues}"></span>
-                        </button>
+    <ul class="dropdown-menu w-80">
+        <li th:if="${notifications == null || #lists.isEmpty(notifications)}"
+            class="dropdown-item text-center text-gray-500">
+            Aucune notification
+        </li>
 
-                        <ul class="dropdown-menu w-80">
-                            <li th:each="notif : ${notifications}" th:id="'notif-'+${notif.id}" class="mb-1">
-                                <a th:href="${notif.lien != null ? notif.lien : (notif.commande != null ? '/commande/details/' + notif.commande.id : '#')}"
-                                   th:data-id="${notif.id}"
-                                   th:data-message="${notif.message}"
-                                   class="dropdown-item notification-link block w-full px-3 py-2 rounded hover:bg-pink-200 cursor-pointer">
-    <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
-    <p th:utext="${notif.message != null ? notif.message : 'Vous avez une nouvelle notification'}"></p>
-    <small class="text-gray-500"
-           th:text="${#temporals.format(notif.dateCreation, 'dd/MM/yyyy HH:mm')}"></small>
-</a>
+        <li th:each="notif : ${notifications}"
+            th:id="'notif-' + ${notif.id}"
+            class="mb-1">
 
+            <a th:href="${notif.lien != null ? notif.lien : '#'}"
+               th:data-id="${notif.id}"
+               th:data-message="${notif.message}"
+               class="dropdown-item notification-link block w-full px-3 py-2 rounded hover:bg-pink-200 cursor-pointer">
 
-                            </li>
-                        </ul>
-                    </div>
+                <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
+                <p th:utext="${notif.message != null ? notif.message : 'Vous avez une nouvelle notification'}"></p>
+                <small class="text-gray-500"
+                       th:text="${#temporals.format(notif.dateCreation, 'dd/MM/yyyy HH:mm')}"></small>
+            </a>
+        </li>
+    </ul>
+</div>
+
 
                     <!-- Panier -->
                     <a th:href="@{/panier}" class="flex flex-col items-center hover:text-pink-500 group">
@@ -208,7 +219,8 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
 
-        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfMeta = document.querySelector('meta[name="_csrf"]');
+        const csrfToken = csrfMeta ? csrfMeta.content : null;
         const badge = document.getElementById("notif-badge");
 
         document.querySelectorAll(".notification-link").forEach(link => {
@@ -219,25 +231,29 @@
                 const message = this.dataset.message;
                 const url = this.getAttribute("href");
 
-                // Marquer notification comme lue
-                fetch(`/notification/marquer-lue/${notifId}`, {
-                    method: "POST",
-                    headers: { "X-CSRF-TOKEN": csrfToken }
-                });
-
-                // Mise à jour du badge
-                if (badge) {
-                    let nb = parseInt(badge.textContent) - 1;
-                    if (nb > 0) badge.textContent = nb;
-                    else badge.style.display = "none";
+                // Marquer comme lue
+                if (notifId && csrfToken) {
+                    fetch(`/notification/marquer-lue/${notifId}`, {
+                        method: "POST",
+                        headers: { "X-CSRF-TOKEN": csrfToken }
+                    });
                 }
 
-                // Si la notification contient "Cause", afficher le modal
+                // Mettre à jour badge
+                if (badge && badge.textContent) {
+                    let nb = parseInt(badge.textContent);
+                    if (!isNaN(nb)) {
+                        nb--;
+                        if (nb > 0) badge.textContent = nb;
+                        else badge.style.display = "none";
+                    }
+                }
+
+                // Si message contient "Cause", afficher modal
                 if (message && message.includes("Cause")) {
                     const modalBody = document.getElementById("notifModalBody");
                     modalBody.textContent = message;
 
-                    // Ouvrir le modal
                     const notifModal = new bootstrap.Modal(document.getElementById("notifModal"));
                     notifModal.show();
                 } else if (url && url !== "#") {
@@ -246,8 +262,9 @@
             });
         });
     });
-
 </script>
+
+
 <!-- Modal notification -->
 <div class="modal fade" id="notifModal" tabindex="-1" aria-labelledby="notifModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -62,7 +62,7 @@ public class ReportService {
         notif.setType(NotificationType.ANNONCE);
         notif.setTitre("Annonce signalée");
         notif.setMessage("L’annonce '" + announcement.getTitre() + "' a été signalée pour : " + reason);
-        notif.setLien("/admin/gerer_report/annonce/" + savedReport.getId()); // lien vers la gestion
+        notif.setLien("/admin/gerer_report/reports" + savedReport.getId()); // lien vers la gestion
         notificationService.creerNotificationSimple(notif);
         return savedReport ;
     }
@@ -132,6 +132,39 @@ public class ReportService {
 
     public List<Report> getAllAnnouncementReports() {
         return reportRepository.findAll();
+    }
+    @Transactional
+    public void sendWarningForAnnouncement(Long reportId) {
+        Report report = getAnnouncementReportsById(reportId);
+
+        utilisateur annonceur = report.getAnnouncement().getCreatedBy();
+
+        Notification notif = new Notification();
+        notif.setUtilisateur(annonceur);
+        notif.setType(NotificationType.WARNING);
+        notif.setTitre("⚠️ Avertissement");
+        notif.setMessage("Votre annonce '" + report.getAnnouncement().getTitre() +
+                "' a été signalée. Veuillez respecter les règles de la plateforme.");
+        notif.setDateCreation(LocalDateTime.now());
+        notif.setLue(false);
+
+        notificationService.creerNotificationSimple(notif);
+
+        report.setStatus(ReportStatus.RESOLVED);
+        reportRepository.save(report);
+    }
+    @Transactional
+    public void supprimerAnnonceEtResoudre(Long reportId) {
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Signalement introuvable"));
+
+        Announcement annonce = report.getAnnouncement();
+        if (annonce != null) {
+            announcementService.deleteAnnouncement(annonce.getId());
+        }
+
+        report.setStatus(ReportStatus.RESOLVED);
+        reportRepository.save(report);
     }
 
 }

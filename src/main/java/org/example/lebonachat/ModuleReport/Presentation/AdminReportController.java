@@ -106,8 +106,34 @@ public class AdminReportController {
         model.addAttribute("announcementReports", reports);
         model.addAttribute("userReports", userReports);
 
-        return "/admin/reports";
+        return "admin/reports";
     }
+    // ⚠️ Envoyer avertissement pour une annonce
+    @PostMapping("/annonce/avertir")
+    public String warnAnnouncement(@RequestParam Long reportId,
+                                   RedirectAttributes redirectAttributes) {
+        try {
+            reportService.sendWarningForAnnouncement(reportId);
+            redirectAttributes.addFlashAttribute("success", "Avertissement envoyé et signalement résolu.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/gerer_report/reports";
+    }
+
+    // ⚠️ Envoyer avertissement pour un utilisateur
+    @PostMapping("/user/avertir")
+    public String warnUser(@RequestParam Long userReportId,
+                           RedirectAttributes redirectAttributes) {
+        try {
+            userReportService.sendWarningForUser(userReportId);
+            redirectAttributes.addFlashAttribute("success", "Avertissement envoyé et signalement résolu.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/admin/gerer_report/reports";
+    }
+
 
 
 
