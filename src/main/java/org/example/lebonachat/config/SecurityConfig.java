@@ -39,17 +39,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        // Pages publiques
                         .requestMatchers("/", "/login", "/register", "/accueil", "/css/**", "/js/**", "/images/**", "/uploads/**", "/error").permitAll()
                         .requestMatchers("/annonces/**", "/annonce/*", "/search", "/filter/category", "/category/list", "/api/**").permitAll()
-
-                        // Pages utilisateurs connectés
                         .requestMatchers("/profil/**", "/panier/**", "/notification/**", "/commande/details/**").authenticated()
-
-                        // Pages admin
-                        .requestMatchers("/category/new", "/category/save", "/category/delete/**").hasAuthority("ROLE_ADMIN")
-
-                        // Toute autre requête nécessite authentification
+                        .requestMatchers("/candidature/download/**").permitAll() // seuls les connectés peuvent télécharger
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -72,4 +65,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste CV</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        a.download-link {
+            color: white;
+            background-color: #d94b7c;
+            padding: 4px 10px;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        a.download-link:hover {
+            background-color: #c43f6d;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Candidatures reçues</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Candidat</th>
+        <th>CV</th>
+        <th>Date d'envoi</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="c : ${candidatures}">
+        <td th:text="${c.candidat.email}">email@example.com</td>
+        <td>
+            <a th:href="@{/candidature/download/{id}(id=${c.id})}"
+               class="download-link"
+               th:attr="download=${#strings.replace(c.cvFileName, ' ', '_')}">
+                Télécharger CV
+
+            </a>
+
+
+
+
+
+
+        </td>
+        <td th:text="${#temporals.format(c.dateEnvoi, 'dd/MM/yyyy HH:mm')}">15/02/2026 01:00</td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

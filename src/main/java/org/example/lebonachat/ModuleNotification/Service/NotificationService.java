@@ -34,7 +34,7 @@ public class NotificationService {
                 commande.getAcheteur().getNom());
         notification.setTitre("Nouvelle commande");
         notification.setType(NotificationType.COMMANDE);
-
+        notification.setLien("/commande/details/" + commande.getId());
         notificationRepository.save(notification);
     }
 
@@ -101,4 +101,18 @@ public class NotificationService {
         return notificationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Notification introuvable"));
     }
+    @Transactional
+    public void creerNotificationAnnonce(utilisateur destinataire, String titre, String message, String lien) {
+        Notification notif = new Notification();
+        notif.setUtilisateur(destinataire);
+        notif.setTitre(titre);
+        notif.setMessage(message);
+        notif.setLien(lien);
+        notif.setType(NotificationType.ANNONCE); // Assure-toi que tu as ce type
+        notif.setDateCreation(LocalDateTime.now());
+        notif.setLue(false);
+
+        notificationRepository.save(notif);
+    }
+
 }
