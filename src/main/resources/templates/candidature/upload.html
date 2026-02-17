@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Envoyer votre CV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+
+<div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h1 class="text-2xl font-bold mb-6 text-center">Envoyer votre CV</h1>
+
+    <!-- Affichage du message d'erreur si présent -->
+    <div th:if="${message}" class="bg-red-100 text-red-700 p-3 rounded mb-4">
+        <p th:text="${message}"></p>
+    </div>
+
+    <form th:action="@{/candidature/postuler/{annonceId}(annonceId=${annonceId})}"
+          method="post"
+          enctype="multipart/form-data"
+          class="flex flex-col gap-4">
+
+        <!-- Input fichier -->
+        <label class="block text-gray-700 font-medium">Choisir votre CV (PDF, max 10MB)</label>
+        <input type="file" name="cvFile" accept=".pdf" required
+               class="border border-gray-300 p-2 rounded w-full"/>
+
+        <!-- Bouton envoyer -->
+        <button type="submit"
+                class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+            Envoyer CV
+        </button>
+
+        <!-- Lien retour -->
+        <a th:href="@{/annonces}" class="text-gray-600 mt-2 text-center hover:underline">
+            Retour aux annonces
+        </a>
+    </form>
+</div>
+
+</body>
+</html>

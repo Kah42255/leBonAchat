@@ -4,109 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liste des annonces</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
+
 <body class="bg-gray-50 min-h-screen">
 
-<!-- Navbar -->
-<nav class="bg-white shadow-sm border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex items-center">
-                <span class="text-2xl font-bold text-[#fd6c9e]">Lebonachat</span>
+<!-- ================= NAVBAR ================= -->
+<nav class="bg-white shadow-md w-full border-b border-gray-200 p-4">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <!-- Logo + Nom du site -->
+        <div class="flex items-center gap-4 justify-center md:justify-start">
+            <img src="/images/logo.png" alt="Logo" class="w-20 h-20 object-contain">
+            <span class="text-3xl font-extrabold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
+                <span class="text-4xl">L</span>ebonachat
+            </span>
+        </div>
+
+        <!-- Boutons / Recherche / Profil -->
+        <div class="flex flex-col md:flex-row md:items-center md:gap-4 w-full md:w-auto">
+            <!-- Déposer / Gérer annonces selon rôle -->
+            <div class="flex gap-2 mb-2 md:mb-0">
+                <!-- ADMIN -->
+                <th:block th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                    <a href="/admin/annonces"
+                       class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 font-semibold">
+                        Gérer les annonces
+                    </a>
+                    <a href="/admin/gerer_report/reports" class="btn btn-warning">
+                        🚨 Gérer les signalements
+                    </a>
+                </th:block>
+
+                <!-- UTILISATEUR -->
+                <th:block th:if="${#authorization.expression('!hasRole(''ADMIN'')')}">
+                    <a th:if="${connectedUser != null}" th:href="@{/annonces}"
+                       class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 font-semibold">
+                        Déposer une annonce
+                    </a>
+                    <a th:unless="${connectedUser != null}" th:href="@{/login}"
+                       class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 font-semibold">
+                        Déposer une annonce
+                    </a>
+                </th:block>
             </div>
-            <div class="flex items-center">
-                <a th:if="${user != null}" th:href="@{/profil}" class="flex flex-col items-center hover:text-[#fd6c9e] group">
-                    <div class="relative">
-                        <div class="h-10 w-10 rounded-full bg-gradient-to-r from-[#fd6c9e] to-[#ff8ab3] flex items-center justify-center text-white font-semibold mb-1 group-hover:scale-105 transition-transform"
-                             th:text="${#strings.toUpperCase(#strings.substring(user.nom,0,1)) + #strings.toUpperCase(#strings.substring(user.prenom,0,1))}">
-                            AB
+
+            <!-- Barre de recherche -->
+            <form class="flex flex-1 gap-2 mb-2 md:mb-0" method="get" action="/search">
+                <input type="text" name="keyword"
+                       class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
+                       placeholder="Rechercher...">
+                <button class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 font-semibold">
+                    Rechercher
+                </button>
+            </form>
+
+            <!-- Profil, notifications et panier -->
+            <div class="flex items-center gap-4 justify-end">
+
+                <!-- Utilisateur non connecté -->
+                <span th:if="${connectedUser == null}">
+                    <a th:href="@{/login}" class="flex flex-col items-center hover:text-pink-500">
+                        <img src="/images/compte.png" alt="Compte" class="h-8 w-8 mb-1">
+                        <span>Se connecter</span>
+                    </a>
+                </span>
+
+                <!-- Utilisateur connecté -->
+                <span th:if="${connectedUser != null}" class="flex items-center gap-4">
+
+                    <!-- Profil -->
+                    <a th:href="@{/profil}" class="flex flex-col items-center hover:text-pink-500 group">
+                        <div class="relative">
+                            <div class="h-8 w-8 rounded-full bg-gradient-to-r from-pink-500 to-pink-600 flex items-center justify-center text-white font-semibold mb-1 group-hover:scale-105 transition-transform"
+                                 th:text="${#strings.toUpperCase(#strings.substring(connectedUser.nom,0,1)) + #strings.toUpperCase(#strings.substring(connectedUser.prenom,0,1))}">
+                                AB
+                            </div>
+                            <div class="absolute -bottom-0.5 -right-0.5 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></div>
                         </div>
-                        <div class="absolute -bottom-1 -right-1 h-4 w-4 bg-green-500 rounded-full border-2 border-white"></div>
+                        <span class="text-sm font-medium text-gray-700" th:text="${connectedUser.nom}">Nom</span>
+                    </a>
+
+                    <!-- notification -->
+                    <div class="dropdown relative">
+                        <button class="flex flex-col items-center hover:text-pink-500 group"
+                                type="button" id="dropdownNotifications"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fa-solid fa-bell text-2xl text-gray-700 group-hover:text-pink-500"></i>
+                            <span id="notif-badge"
+                                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
+                                  th:if="${nbNotificationsNonLues != null and nbNotificationsNonLues > 0}"
+                                  th:text="${nbNotificationsNonLues}"></span>
+                        </button>
+
+                        <ul class="dropdown-menu w-80 p-2 text-sm break-words max-h-96 overflow-y-auto">
+                            <li th:if="${notifications == null || #lists.isEmpty(notifications)}"
+                                class="dropdown-item text-center text-gray-500">
+                                Aucune notification
+                            </li>
+
+                            <li th:each="notif : ${notifications}" th:id="'notif-' + ${notif.id}" class="mb-1">
+                                <a th:href="${notif.lien != null ? notif.lien : '#'}"
+                                   th:data-id="${notif.id}"
+                                   th:data-message="${notif.message}"
+                                   th:data-type="${notif.type}"
+                                   class="dropdown-item notification-link block w-full px-3 py-2 rounded hover:bg-pink-200 cursor-pointer">
+                                    <h4 th:text="${notif.titre != null ? notif.titre : 'Notification'}"></h4>
+                                    <p th:utext="${notif.message != null ? notif.message : 'Vous avez une nouvelle notification'}"></p>
+                                    <small class="text-gray-500"
+                                           th:text="${#temporals.format(notif.dateCreation, 'dd/MM/yyyy HH:mm')}"></small>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <span class="text-sm font-medium text-gray-700" th:text="${user.nom}">Nom</span>
-                </a>
-                <form th:action="@{/logout}" method="post" class="ml-2">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit"
-                            class="px-4 py-2 bg-[#FF8DA1] text-white rounded-md hover:bg-[#FF6C9E] transition duration-300 font-semibold text-sm">
-                        Se déconnecter
-                    </button>
-                </form>
+
+                    <!-- Panier -->
+                    <a th:href="@{/panier}" class="flex flex-col items-center hover:text-pink-500 group">
+                        <div class="relative">
+                            <i class="fa-solid fa-cart-shopping text-2xl text-gray-700 group-hover:text-pink-500"></i>
+                            <span id="panierCount"
+                                  class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-1"
+                                  th:text="${nbArticlesPanier != null ? nbArticlesPanier : 0}"></span>
+                        </div>
+                        <span class="text-sm text-gray-700">Panier</span>
+                    </a>
+                </span>
             </div>
         </div>
-        <div class="hidden md:flex space-x-8 mt-2">
-            <a th:href="@{/accueil}" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Accueil</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Immobilier</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Véhicules</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Vacances</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Emploi</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Électronique</a>
-            <a href="#" class="text-gray-700 hover:text-[#fd6c9e] font-medium">Contact</a>
-        </div>
+    </div>
+
+    <!-- Categories -->
+    <div class="flex flex-wrap gap-6 mt-4 text-gray-700 font-medium justify-center md:justify-start">
+        <a th:href="@{/accueil}" class="hover:text-pink-500">Accueil</a>
+        <a th:each="cat : ${categories}"
+           th:href="@{/accueil(categoryId=${cat.id})}"
+           th:text="${cat.nom}"
+           th:classappend="${categoryId != null and categoryId == cat.id} ? 'text-pink-500 font-bold' : ''"
+           class="hover:text-pink-500"></a>
     </div>
 </nav>
 
-<!-- Main Content -->
+
+<!-- ================= MAIN CONTENT ================= -->
 <div class="max-w-7xl mx-auto px-4 py-8">
     <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Liste des Annonces</h2>
 
+    <!-- Search & Filter -->
     <div class="flex flex-col md:flex-row md:justify-between gap-4 mb-8">
         <form class="flex flex-1 gap-2" method="get" action="/search">
             <input type="text" name="keyword"
-                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400"
-                   placeholder="Rechercher...">
-            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 font-semibold">
+                   placeholder="Rechercher..."
+                   class="flex-1 px-4 py-2 border rounded-md focus:ring-2 focus:ring-pink-400">
+            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold">
                 Rechercher
             </button>
         </form>
 
-        <form action="/filter/category" method="get" class="flex items-center gap-2">
-            <select name="categoryId"
-                    class="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400">
+        <form action="/filter/category" method="get" class="flex gap-2">
+            <select name="categoryId" class="px-3 py-2 border rounded-md focus:ring-2 focus:ring-pink-400">
                 <option value="0">Toutes les catégories</option>
                 <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.nom}"></option>
             </select>
-            <button type="submit"
-                    class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] focus:outline-none focus:ring-2 focus:ring-pink-400">
+            <button class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold">
                 Filtrer
             </button>
         </form>
 
-        <a href="/annonce/new"
-           class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 font-semibold text-center">
+        <a href="/annonce/new" class="px-4 py-2 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] font-semibold text-center">
             + Nouvelle annonce
         </a>
     </div>
-</div>
 
-    <!-- Annonces Grid -->
+    <!-- ================= GRID ================= -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        <div class="bg-white shadow-md rounded-lg overflow-hidden" th:each="a : ${annonces}">
-            <!-- Image -->
-            <div th:if="${a.imagePath != null}" class="h-48 w-full">
-                <img th:src="@{${a.imagePath}}" alt="Image annonce" class="w-full h-48 object-cover"/>
-            </div>
+        <div th:each="a : ${annonces}"
+             th:if="${a.etat.equals(T(org.example.lebonachat.ModuleAnnonce.Metier.Enum.EtatAnnonce).VALIDE)
+         or (connectedUser != null and connectedUser.role.name() == 'ROLE_ADMIN')}"
+
+             class="bg-white shadow-md rounded-lg overflow-hidden">
+
+
+        <img th:if="${a.imagePath != null}" th:src="@{${a.imagePath}}" class="w-full h-48 object-cover"/>
 
             <div class="p-4">
-                <h3 class="text-lg font-bold mb-2 text-gray-800" th:text="${a.titre}"></h3>
-                <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
-                <p class="text-gray-700 mb-1"><strong>Prix:</strong> <span th:text="${a.prix}"></span> DA</p>
-                <p class="text-gray-700 mb-4"><strong>Ville:</strong> <span th:text="${a.ville}"></span></p>
+                <h3 class="text-lg font-bold mb-2" th:text="${a.titre}"></h3>
+               <!-- <p class="text-gray-600 mb-2" th:text="${a.description}"></p>
+                <p><strong>Prix :</strong> <span th:text="${a.prix}"></span> DA</p>
+                <p class="mb-4"><strong>Ville :</strong> <span th:text="${a.ville}"></span></p>-->
 
-                <div class="flex flex-wrap gap-2">
-                    <a th:href="@{'/annonce/' + ${a.id}}"
-                       class="px-3 py-1 bg-[#fd6c9e] text-white rounded-md hover:bg-[#f18baa] transition duration-300 text-sm font-semibold">
-                        Voir détails
-                    </a>
-                    <a th:if="${user != null and a.createdBy.id == user.id}"
-                       th:href="@{'/annonce/delete/' + ${a.id}}"
-                       onclick="return confirm('Supprimer cette annonce ?')"
-                       class="px-3 py-1 bg-[#C11C84] text-white rounded-md hover:bg-[#D100D1] transition duration-300 text-sm font-semibold">
-                        Supprimer
-                    </a>
-                </div>
+                <a th:href="@{/annonce/{id}(id=${a.id})}"
+                   class="block text-center px-3 py-2 bg-[#fd6c9e] text-white rounded hover:bg-[#f18baa] font-semibold mb-2">
+                    Voir détails
+                </a>
+
+                <form th:if="${connectedUser != null}" th:action="@{/panier/ajouter/{id}(id=${a.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                    <button class="w-full px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600 font-semibold">
+                        Au panier
+                    </button>
+                </form>
             </div>
         </div>
     </div>

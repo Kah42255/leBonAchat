@@ -4,36 +4,263 @@
     <meta charset="UTF-8">
     <title>Détails annonce</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+    <style>
+        body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .annonce-container { background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); margin: 24px auto; position: relative; }
+        .annonce-title { font-size: 28px; font-weight: bold; color: #333; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb; }
+        .annonce-info { margin-bottom: 14px; font-size: 16px; line-height: 1.6; display: flex; }
+        .annonce-label { font-weight: 600; color: #6b7280; min-width: 140px; flex-shrink: 0; }
+        .annonce-value { color: #111827; flex-grow: 1; }
+        .image-container { background-color: #f9fafb; display: flex; align-items: center; justify-content: center; color: #999; font-size: 18px; height: 100%; min-height: 400px; position: relative; }
+        .content-wrapper { max-width: 1200px; margin: 0 auto; padding: 32px 16px; }
+        .action-buttons { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb; }
+        .btn-retour, .btn-modifier, .btn-supprimer { color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 500; margin-right: 10px; cursor: pointer; }
+        .btn-retour { background-color: #fd6c9e; }
+        .btn-modifier { background-color: #f8a1bd; }
+        .btn-supprimer { background-color:#d94b7c; }
+        .btn-retour:hover { background-color: #e85b8c; }
+        .btn-modifier:hover { background-color: #f48aad; }
+        .btn-supprimer:hover { background-color: #c43f6d; }
+        .annonce-layout { display: flex; flex-direction: column; }
+        @media (min-width: 768px) { .annonce-layout { flex-direction: row; } }
+        .image-section, .details-section { flex: 1; padding: 20px; }
+        .annonce-image { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .info-card { background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 40px; }
+        .three-dot-button { position: absolute; top: 20px; right: 20px; z-index: 10; }
+        .dropdown a:hover { background-color: #fd6c9e; color: white; }
+
+    </style>
 </head>
+<body>
+<div class="flex items-center justify-center gap-3 mb-6">
+    <!-- Logo -->
+    <img src="/images/logo.png"
+         alt="Logo"
+         class="w-12 h-12 object-contain">
 
-<body class="bg-gray-50 min-h-screen">
-
-<div class="max-w-4xl mx-auto p-4">
-
-    <h2 class="text-3xl font-bold mb-4 text-gray-800" th:text="${annonce.titre}"></h2>
-
-    <!-- Image -->
-    <div th:if="${annonce.imagePath != null}" class="mb-6">
-        <img th:src="@{${annonce.imagePath}}"
-             alt="Image annonce"
-             class="w-full max-w-2xl h-96 object-cover rounded-md mx-auto shadow-md"/>
-    </div>
-
-    <div class="bg-white p-6 rounded-lg shadow-md">
-        <p class="mb-3"><strong>Description :</strong></p>
-        <p class="text-gray-700 mb-4" th:text="${annonce.description}"></p>
-
-        <p class="text-gray-700 mb-2"><strong>Prix :</strong> <span th:text="${annonce.prix}"></span> DA</p>
-        <p class="text-gray-700 mb-2"><strong>Ville :</strong> <span th:text="${annonce.ville}"></span></p>
-        <p class="text-gray-700 mb-2"><strong>Catégorie :</strong> <span th:text="${annonce.category.nom}"></span></p>
-
-        <a href="/annonces"
-           class="inline-block mt-4 px-4 py-2 bg-[#fd6c9e] text-white rounded-lg hover:bg-[#f18baa] transition duration-300 font-semibold">
-            Retour
-        </a>
-    </div>
-
+    <!-- Text logo -->
+    <span class="text-3xl font-extrabold bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
+        <span class="text-4xl">L</span>ebonachat
+    </span>
 </div>
+
+<div class="content-wrapper">
+    <h1 class="annonce-title" th:text="${annonce.titre}"></h1>
+
+    <div class="annonce-container">
+
+        <!-- Bouton 3 points -->
+        <div class="three-dot-button relative inline-block text-left">
+
+            <button id="menu-button" type="button"
+                    th:if="${user != null and user.id != annonce.createdBy.id}"
+                    class="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-3 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                    aria-expanded="true" aria-haspopup="true">
+                ⋮
+            </button>
+
+            <!-- Menu déroulant -->
+            <div id="dropdown-menu" class="dropdown origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+                <a href="#"
+                   th:onclick="'openReportModal(' + ${annonce.id} + ', \'annonce\'); return false;'"
+                   class="block px-4 py-2 text-sm text-gray-700"
+                   role="menuitem">Signaler l'annonce aux admins</a>
+            </div>
+        </div>
+
+        <div class="annonce-layout">
+            <div class="image-section">
+                <div class="image-container">
+                    <div th:if="${annonce.imagePath != null}">
+                        <img th:src="${annonce.imagePath}" alt="Image de l'annonce" class="annonce-image">
+                    </div>
+                    <div th:if="${annonce.imagePath == null}">
+                        <div class="text-center p-10">
+                            <p class="mt-4 text-gray-600">Aucune image disponible</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-section">
+                <div class="info-card">
+                    <!-- Prix ou Société -->
+                    <!-- Pour toutes les catégories sauf Offre d'Emploi -->
+                    <div th:if="${annonce.category.nom != 'Offre d''Emploi'}">
+                        <span>Prix :</span>
+                        <span th:text="${annonce.prix}"></span>
+                    </div>
+
+
+                    <!-- Description -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Description :</span>
+                        <span class="annonce-value" th:text="${annonce.description}"></span>
+                    </div>
+
+                    <!-- Ville -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Ville :</span>
+                        <span class="annonce-value" th:text="${annonce.ville}"></span>
+                    </div>
+
+                    <!-- Catégorie -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Catégorie :</span>
+                        <span class="annonce-value" th:text="${annonce.category.nom}"></span>
+                    </div>
+
+                    <!-- Date de création -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Date de création :</span>
+                        <span class="annonce-value" th:text="${#temporals.format(annonce.date, 'dd/MM/yyyy')}"></span>
+                    </div>
+
+                    <!-- Créé par -->
+                    <div class="annonce-info">
+                        <span class="annonce-label">Créé par :</span>
+                        <span class="annonce-value">
+            <a th:href="@{/profil/{id}(id=${annonce.createdBy.id})}"
+               class="text-blue-600 hover:underline"
+               th:text="${annonce.createdBy.email}">abc@usdb.dz</a>
+        </span>
+                    </div>
+                </div>
+
+
+
+                <div class="action-buttons flex gap-2">
+                        <a th:href="@{/annonces}" class="btn-retour">Retour</a>
+
+
+
+                        <!-- Si catégorie = Offre d'Emploi -->
+                        <a th:if="${annonce.category.nom == 'Offre d''Emploi' and user.id != annonce.createdBy.id}"
+                           th:href="@{/candidature/postuler/{annonceId}(annonceId=${annonce.id})}"
+                           class="w-full px-3 py-2 bg-[#d94b7c] text-white rounded hover:bg-[#c43f6d] font-semibold">
+                            Envoyer CV
+                        </a>
+
+                        <!-- Sinon Ajouter au panier -->
+                        <form th:if="${annonce.category.nom != 'Offre d''Emploi' and user != null and user.id != annonce.createdBy.id}"
+                              th:action="@{/panier/ajouter/{id}(id=${annonce.id})}" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                            <button class="w-full px-3 py-2 bg-[#d94b7c] text-white rounded hover:bg-[#c43f6d] font-semibold">
+                                Ajouter au panier
+                            </button>
+                        </form>
+
+
+
+
+                        <div th:if="${user != null and user.id == annonce.createdBy.id}" class="flex gap-2">
+                            <a th:href="@{/annonce/modifier/{id}(id=${annonce.id})}" class="btn-modifier">Modifier</a>
+
+                            <form th:action="@{/annonce/delete/{id}(id=${annonce.id})}"
+                                  method="post"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette annonce ?')">
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                <button type="submit" class="btn-supprimer">Supprimer</button>
+                            </form>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour signalement avec options prédéfinies -->
+<div id="report-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-lg w-96 p-6 relative">
+        <h2 class="text-lg font-semibold mb-4" id="modal-title">Signaler l'annonce</h2>
+
+        <div class="flex flex-col gap-2 mb-4">
+            <label><input type="radio" name="reportReason" value="Contenus inappropriés ou interdits"> Contenus inappropriés ou interdits</label>
+            <label><input type="radio" name="reportReason" value="Spam et répétition"> Spam et répétition (Doublons d'annonces)</label>
+            <label><input type="radio" name="reportReason" value="Prix anormalement bas"> Prix anormalement bas, trop beaux pour être vrais</label>
+            <label><input type="radio" name="reportReason" value="Arnaques et fraudes"> Arnaques et fraudes</label>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button id="cancel-report" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Annuler</button>
+            <button id="submit-report" class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600">Envoyer</button>
+        </div>
+    </div>
+</div>
+
+<!-- Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const menuButton = document.getElementById('menu-button');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+        // Menu déroulant
+        if(menuButton && dropdownMenu){
+            menuButton.addEventListener('click', e => {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', e => {
+                if(!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)){
+                    dropdownMenu.classList.add('hidden');
+                }
+            });
+        }
+
+        // Modal signalement
+        const modal = document.getElementById('report-modal');
+        const submitButton = document.getElementById('submit-report');
+        const cancelButton = document.getElementById('cancel-report');
+
+        let currentAnnouncementId = null;
+
+        window.openReportModal = function(announcementId){
+            currentAnnouncementId = announcementId;
+            document.getElementById('modal-title').textContent = "Signaler l'annonce";
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        cancelButton.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        });
+
+        submitButton.addEventListener('click', () => {
+            const selected = document.querySelector('input[name="reportReason"]:checked');
+            if(!selected){ alert("Veuillez sélectionner un motif."); return; }
+            const reason = selected.value;
+
+            fetch('/report/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: `announcementId=${currentAnnouncementId}&reason=${encodeURIComponent(reason)}`
+            }).then(res => {
+                if(res.ok){
+                    alert("Signalement envoyé avec succès !");
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                } else {
+                    alert("Erreur lors de l'envoi du signalement.");
+                }
+            }).catch(err => {
+                console.error(err);
+                alert("Erreur lors de l'envoi du signalement.");
+            });
+        });
+    });
+</script>
 
 </body>
 </html>
