@@ -4,7 +4,6 @@ import org.example.lebonachat.ModuleUser.Metier.utilisateur;
 import org.example.lebonachat.ModuleUser.Service.UserService;
 import org.example.lebonachat.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +11,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
+@CrossOrigin(origins = "*") // autorise toutes les origines pour test mobile
 public class AuthController {
 
     @Autowired
@@ -23,10 +22,12 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> data) {
-        utilisateur user = userService.findByEmail(data.get("email"));
+        String email = data.get("email");
+        String password = data.get("password");
 
-        if (!userService.matches(data.get("password"), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        utilisateur user = userService.findByEmail(email);
+        if (user == null || !userService.matches(password, user.getPassword())) {
+            return ResponseEntity.status(401).body(Map.of("error", "Email ou mot de passe incorrect"));
         }
 
         String token = jwtUtil.generateToken(user.getEmail());
@@ -39,6 +40,9 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody utilisateur user) {
+        if (userService.emailExists(user.getEmail())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Email déjà utilisé"));
+        }
         utilisateur u = userService.registerUser(
                 user.getNom(),
                 user.getPrenom(),

@@ -102,19 +102,20 @@ public class CommandeService {
                 "Votre commande #" + commande.getId() + " a été validée par l’annonceur."
         );
     }
-
     @Transactional
     public void annulerCommandeAnnonceur(Commande commande, utilisateur annonceur, String cause) {
+        // 1️⃣ Changer l'état de la commande
         commande.setEtat(EtatCommande.EST_ANNULEE);
-
+        commande.setCauseAnnulation(cause);
+        // 2️⃣ Sauvegarder la commande
         commandeRepository.save(commande);
 
-        // Notification à l’acheteur
-        notificationService.creerNotificationCommande(
+        // 3️⃣ Notification à l’acheteur avec le type WARNING
+        notificationService.creerNotificationCommandeAnnulee(
                 commande.getAcheteur(),
                 commande,
-                "Commande annulée",
-                "Votre commande #" + commande.getId() + " a été annulée. Motif : " + cause
+                cause
         );
     }
+
 }

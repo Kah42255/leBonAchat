@@ -72,7 +72,8 @@ private NotificationService notificationService;
 
     @GetMapping("/accueil")
 
-    public String accueil(@RequestParam(required = false) Long categoryId, Model model) {
+    public String accueil(@RequestParam(required = false) Long categoryId,
+                          @RequestParam(required = false) String commandeAnnuleeMessage ,Model model) {
         System.out.println("DEBUG: /accueil appelé avec categoryId = " + categoryId);
 
         // 1️⃣ Récupérer l'utilisateur connecté
@@ -124,7 +125,10 @@ private NotificationService notificationService;
             model.addAttribute("notifications", notifications);
             model.addAttribute("nbNotificationsNonLues", nbNotificationsNonLues);
         }
-
+        if (commandeAnnuleeMessage != null && !commandeAnnuleeMessage.isEmpty()) {
+            model.addAttribute("commandeAnnuleeMessage", commandeAnnuleeMessage);
+            System.out.println("DEBUG: Modal commande annulée -> " + commandeAnnuleeMessage);
+        }
         return "accueil";
     }
 

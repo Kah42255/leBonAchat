@@ -62,7 +62,8 @@ public class ReportService {
         notif.setType(NotificationType.ANNONCE);
         notif.setTitre("Annonce signalée");
         notif.setMessage("L’annonce '" + announcement.getTitre() + "' a été signalée pour : " + reason);
-        notif.setLien("/admin/gerer_report/reports" + savedReport.getId()); // lien vers la gestion
+        notif.setLien("/admin/gerer_report/annonce/" + savedReport.getId());
+
         notificationService.creerNotificationSimple(notif);
         return savedReport ;
     }
@@ -141,7 +142,8 @@ public class ReportService {
 
         Notification notif = new Notification();
         notif.setUtilisateur(annonceur);
-        notif.setType(NotificationType.WARNING);
+        notif.setType(NotificationType.INFO);
+
         notif.setTitre("⚠️ Avertissement");
         notif.setMessage("Votre annonce '" + report.getAnnouncement().getTitre() +
                 "' a été signalée. Veuillez respecter les règles de la plateforme.");

@@ -22,7 +22,7 @@ public class NotificationController {
         this.utilisateurRepository = utilisateurRepository;
     }
 
-    // Endpoint AJAX pour marquer la notification comme lue
+
     @PostMapping("/marquer-lue/{id}")
     @ResponseBody
     public ResponseEntity<?> marquerCommeLue(
@@ -38,12 +38,15 @@ public class NotificationController {
 
         Long nbNotificationsNonLues = notificationService.countNotificationsNonLues(user);
 
-        return ResponseEntity.ok(new MarquerLueResponse(notif.getType().toString(),
+        return ResponseEntity.ok(new MarquerLueResponse(
+                notif.getType().toString(),
                 notif.getCommande() != null ? notif.getCommande().getId() : null,
-                nbNotificationsNonLues));
+                nbNotificationsNonLues
+        ));
+
     }
 
-    // Classe interne pour envoyer la réponse JSON
+
     static class MarquerLueResponse {
         public String type;
         public Long commandeId;

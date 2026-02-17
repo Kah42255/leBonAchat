@@ -12,7 +12,7 @@ import java.util.List;
     public class Commande {
         @Id @GeneratedValue
         private Long id;
-
+        private String causeAnnulation;
         @ManyToOne
         private utilisateur acheteur;
         @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL)
@@ -71,6 +71,14 @@ import java.util.List;
 
         public void setId(Long id) {
             this.id = id;
+        }
+
+        public String getCauseAnnulation() {
+            return causeAnnulation;
+        }
+
+        public void setCauseAnnulation(String causeAnnulation) {
+            this.causeAnnulation = causeAnnulation;
         }
     }
 

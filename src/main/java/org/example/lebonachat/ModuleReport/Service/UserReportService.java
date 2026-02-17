@@ -48,7 +48,8 @@ public class UserReportService {
         notif.setType(NotificationType.INFO);
         notif.setTitre("Utilisateur signalé");
         notif.setMessage("L'utilisateur '" + reportedUser.getNom() + "' a été signalé pour : " + reason);
-        notif.setLien("/admin/gerer_report/reports" + reportedUserId); // lien vers la gestion
+        notif.setLien("/admin/gerer_report/user/" + report.getId());
+
         notificationService.creerNotificationSimple(notif);
     }
     public UserReport getUserReportById(Long userReportId) {
@@ -69,7 +70,7 @@ public class UserReportService {
 
         Notification notif = new Notification();
         notif.setUtilisateur(reportedUser);
-        notif.setType(NotificationType.WARNING);
+        notif.setType(NotificationType.INFO);
         notif.setTitre("⚠️ Avertissement");
         notif.setMessage("Votre compte a été signalé. Merci de respecter les règles de la plateforme.");
         notif.setDateCreation(LocalDateTime.now());

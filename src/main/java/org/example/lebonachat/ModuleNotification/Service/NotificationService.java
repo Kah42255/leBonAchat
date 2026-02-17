@@ -114,5 +114,21 @@ public class NotificationService {
 
         notificationRepository.save(notif);
     }
+    @Transactional
+    public void creerNotificationCommandeAnnulee(utilisateur destinataire,
+                                                 Commande commande,
+                                                 String cause) {
+
+        Notification notif = new Notification();
+        notif.setUtilisateur(destinataire);
+        notif.setCommande(commande);
+        notif.setTitre("Commande annulée");
+        notif.setMessage("Votre commande a été annulée. Cause : " + cause);
+        notif.setType(NotificationType.COMMANDE);
+        notif.setDateCreation(LocalDateTime.now());
+        notif.setLue(false);
+
+        notificationRepository.save(notif);
+    }
 
 }
